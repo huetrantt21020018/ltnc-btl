@@ -6,25 +6,27 @@ using namespace std;
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
 const string WINDOW_TITLE = "Assignment for Advanced programming";
+int TIME_DELAY = 60;
+
+// direct: up, right, down, left
+int dx[4] = {0, 1, 0, -1};
+int dy[4] = {-1, 0, 1, 0};
 
 void initSDL(SDL_Window* &window, SDL_Renderer* &renderer);
 
-void logSDLError(std::ostream& os,
-                 const std::string &msg, bool fatal = false);
+void logSDLError(std::ostream& os, const std::string &msg, bool fatal = false);
 
 void quitSDL(SDL_Window* window, SDL_Renderer* renderer);
 
 void waitUntilKeyPressed();
 
-struct Player
-{
+struct Player {
     int x, y;
-    int sz;
+    int sz, dir;
 
-    Player(int x, int y, int size): x(x), y(y), sz(size) {}
+    Player(int _x, int _y, int size): x(_x), y(_y), sz(size), dir(0) {}
 
-    void render(SDL_Renderer* renderer)
-    {
+    void render(SDL_Renderer* renderer) {
         SDL_Rect filled_rect;
         filled_rect.x = x;
         filled_rect.y = y;
@@ -34,21 +36,36 @@ struct Player
         SDL_RenderFillRect(renderer, &filled_rect);
     }
 
-    bool insideScreen(int minX, int minY, int maxX, int maxY)
-    {
+    bool insideScreen(int minX, int minY, int maxX, int maxY) {
         return minX <= x && x + sz <= maxX &&
                 minY <= y && y + sz <= maxY;
     }
 
-    void move()
-    {
-        x += 1;
-        y += 1;
+    void direct(SDL_Event e) {
+        switch (e.key.keysym.sym) {
+            case SDLK_ESCAPE: break;
+            case SDLK_UP: dir = 1; break;
+            case SDLK_RIGHT: dir = (1 << 1); break;
+            case SDLK_DOWN: dir = (1 << 2); break;
+            case SDLK_LEFT: dir = (1 << 3); break;
+            default: break;
+        }
+    }
+
+    void move() {
+        int stepX = 0, stepY = 0;
+        for(int i = 0; i < 4; ++i) {
+            if((dir >> i) & 1) {
+                stepX += dx[i];
+                stepY += dy[i];
+            }
+        }
+        x += stepX;
+        y += stepY;
     }
 };
 
-void present(SDL_Renderer* renderer, Player &box)
-{
+void present(SDL_Renderer* renderer, Player &box) {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
 
@@ -56,8 +73,17 @@ void present(SDL_Renderer* renderer, Player &box)
     SDL_RenderPresent(renderer);
 }
 
-int main(int argc, char* argv[])
-{
+bool control(Player& box) {
+    SDL_Event e;
+
+    if(SDL_PollEvent(&e) == 0) return 0;
+    if(e.type == SDL_QUIT) return 1;
+    if(e.type == SDL_KEYDOWN)
+        box.direct(e);
+    return 1;
+}
+
+int main(int argc, char* argv[]) {
     SDL_Window* window;
     SDL_Renderer* renderer;
     initSDL(window, renderer);
@@ -67,13 +93,14 @@ int main(int argc, char* argv[])
 
     Player box(10, 10, 10);
 
-    while(box.insideScreen(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT))
-    {
+    while(box.insideScreen(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)) {
+        box.move();
+
         present(renderer, box);
 
-        SDL_Delay(5);
+        SDL_Delay(TIME_DELAY);
 
-        box.move();
+        control(box);
     }
 
     waitUntilKeyPressed();
@@ -82,8 +109,7 @@ int main(int argc, char* argv[])
 
 }
 
-void logSDLError(std::ostream& os,
-                 const std::string &msg, bool fatal)
+void logSDLError(std::ostream& os, const std::string &msg, bool fatal)
 {
     os << msg << " Error: " << SDL_GetError() << std::endl;
     if (fatal) {
@@ -97,15 +123,13 @@ void initSDL(SDL_Window* &window, SDL_Renderer* &renderer)
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
         logSDLError(std::cout, "SDL_Init", true);
 
-    window = SDL_CreateWindow(WINDOW_TITLE.c_str(), SDL_WINDOWPOS_CENTERED,
-       SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow(WINDOW_TITLE.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     //window = SDL_CreateWindow(WINDOW_TITLE.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_FULLSCREEN_DESKTOP);
     if (window == nullptr) logSDLError(std::cout, "CreateWindow", true);
 
 
     //Khi chạy trong môi trường bình thường (không chạy trong máy ảo)
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED |
-                                              SDL_RENDERER_PRESENTVSYNC);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     //Khi chạy ở máy ảo (ví dụ tại máy tính trong phòng thực hành ở trường)
     //renderer = SDL_CreateSoftwareRenderer(SDL_GetWindowSurface(window));
 
@@ -126,8 +150,7 @@ void waitUntilKeyPressed()
 {
     SDL_Event e;
     while (true) {
-        if ( SDL_WaitEvent(&e) != 0 &&
-             (e.type == SDL_KEYDOWN || e.type == SDL_QUIT) )
+        if (SDL_WaitEvent(&e) != 0 && (e.type == SDL_KEYDOWN || e.type == SDL_QUIT) )
             return;
         SDL_Delay(100);
     }
