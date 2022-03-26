@@ -33,11 +33,16 @@
 		</Compiler>
 		<Unit filename="SDL2.dll" />
 		<Unit filename="SDL2_image.dll" />
+		<Unit filename="SDL_utils.cpp" />
+		<Unit filename="SDL_utils.h" />
+		<Unit filename="common.h" />
 		<Unit filename="libjpeg-9.dll" />
 		<Unit filename="libpng16-16.dll" />
 		<Unit filename="libtiff-5.dll" />
 		<Unit filename="libwebp-7.dll" />
 		<Unit filename="main.cpp" />
+		<Unit filename="mainGame.cpp" />
+		<Unit filename="mainGame.h" />
 		<Unit filename="zlib1.dll" />
 		<Extensions>
 			<code_completion />

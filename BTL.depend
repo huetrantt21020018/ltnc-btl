@@ -1,5 +1,31 @@
 # depslib dependency file v1.0
-1646819463 source:c:\users\sinhvienuet\ltnc\btl\main.cpp
+1648265887 source:c:\users\sinhvienuet\ltnc\btl\main.cpp
 	<iostream>
 	<SDL.h>
+	"common.h"
+	"SDL_utils.h"
+	"mainGame.h"
+
+1648219811 source:c:\users\sinhvienuet\ltnc\btl\sdl_utils.cpp
+	"SDL_utils.h"
+	<iostream>
+
+1648214652 c:\users\sinhvienuet\ltnc\btl\sdl_utils.h
+	<iostream>
+	<SDL.h>
+	"SDL_utils.h"
+
+1648264860 c:\users\sinhvienuet\ltnc\btl\common.h
+	<string>
+	"common.h"
+
+1648265855 c:\users\sinhvienuet\ltnc\btl\maingame.h
+	"common.h"
+	<SDL.h>
+
+1648265843 source:c:\users\sinhvienuet\ltnc\btl\maingame.cpp
+	"mainGame.h"
+	<iostream>
+	"common.h"
+	"mainGame.h"
 
