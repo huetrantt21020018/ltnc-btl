@@ -15,8 +15,8 @@ const int MAXSPEED = 15;
 const int sizeBox = 15;
 const int initialHeight = 600;
 
-enum direct {UP, DOWN, LEFT, RIGHT};
-const int stepX[4] = {0, 0, -1, 1};
-const int stepY[4] = {-1, 1, 0, 0};
+enum direct {NONE, UP, DOWN, LEFT, RIGHT};
+const int stepX[5] = {0, 0, 0, -1, 1};
+const int stepY[5] = {0, -1, 1, 0, 0};
 
 #endif // COMMON

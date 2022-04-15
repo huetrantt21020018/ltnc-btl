@@ -3,15 +3,19 @@
 
 #include "common.h"
 #include <SDL.h>
+#include <vector>
 
+int rnd(int a, int b);
 
 
 class Box
 {
-    int x, y;
-    int width, height;
 
 public:
+
+    int x, y;
+    int preX, preY;
+    int width, height;
 
     int speed[4] = {1, 1, 1, 1};
     bool state[4] = {0, 0, 0, 0};
@@ -22,34 +26,22 @@ public:
     void render(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
     void move();
+    Box premove();
 
     bool fallOut();
     bool insideScreen();
-};
 
-class Player
-{
-    Box box;
-
-public:
-
-    Player();
-    Player(int _x, int _y);
-
-    void render(SDL_Renderer* renderer);
-
-    void turn(direct dir, int initSpeed);
-    void handle();
-    void keyboardEvent(SDL_Event e);
-
-    bool death();
+    bool overlap(Box o);
+    direct horizontal(Box o);
+    direct vertical(Box o);
 };
 
 class PlatBasic
 {
-    Box box;
 
 public:
+
+    Box box;
 
     PlatBasic();
     PlatBasic(int _x, int _y, int length);
@@ -57,9 +49,34 @@ public:
     void render(SDL_Renderer* renderer);
 };
 
-void present(SDL_Renderer* renderer, Player &box);
+class Player
+{
+
+public:
+
+    Box box;
+
+    Player();
+    Player(int _x, int _y);
+
+    void render(SDL_Renderer* renderer);
+
+    void turn(direct dir, int initSpeed);
+    void handle(vector<PlatBasic>& plats);
+    void keyboardEvent(SDL_Event e);
+
+    bool death();
+
+    bool meetPlat(PlatBasic &plat);
+};
+
+void initGame(vector<PlatBasic>& plats);
+
+void present(SDL_Renderer* renderer, Player &box, vector<PlatBasic> &plats);
 
 bool keyboardEvent(Player& player);
+
+void handleGame(Player &player, vector<PlatBasic> &plats);
 
 
 #endif // MAIN_GAME

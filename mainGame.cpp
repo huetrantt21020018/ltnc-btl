@@ -1,15 +1,20 @@
 #include "mainGame.h"
 #include <iostream>
+#include <stdlib.h>
+#include <time.h>
 
 #include "common.h"
 #include "mainGame.h"
 
 using namespace std;
 
+int rnd(int a, int b) { return (rand() % (b-a+1) + a); }
+
 // box
 
 Box::Box() {}
-Box::Box(int _x, int _y, int _w, int _h): x(_x), y(_y), width(_w), height(_h) {}
+Box::Box(int _x, int _y, int _w, int _h):
+    x(_x), y(_y), width(_w), height(_h) {}
 
 void Box::render(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 {
@@ -24,6 +29,8 @@ void Box::render(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 
 void Box::move()
 {
+    preX = x;
+    preY = y;
     for(int dir = UP; dir <= RIGHT; dir = dir + 1) if(state[dir])
     {
         x += stepX[dir] * speed[dir];
@@ -37,6 +44,12 @@ void Box::move()
     }
 }
 
+Box Box::premove()
+{
+    Box ret(preX, preY, width, height);
+    return ret;
+}
+
 bool Box::fallOut()
 {
     return y + height >= SCREEN_HEIGHT;
@@ -44,16 +57,38 @@ bool Box::fallOut()
 
 bool Box::insideScreen()
 {
-    return 0 <= x && x + width <= SCREEN_WIDTH && 0 <= y && y + height <= SCREEN_HEIGHT;
+    return (0 <= x && x + width <= SCREEN_WIDTH
+            && 0 <= y && y + height <= SCREEN_HEIGHT);
+}
+
+bool Box::overlap(Box o)
+{
+    return (max(x, o.x) < min(x+width, o.x+o.width)
+            && max(y, o.y) < min(y+height, o.y+o.height));
+}
+
+direct Box::horizontal(Box o)
+{
+    if(x < o.x && x+width > o.x) return LEFT;
+    if(x > o.x && x < o.x+o.width) return RIGHT;
+    return NONE;
+}
+direct Box::vertical(Box o)
+{
+    if(y < o.y && y+height > o.y) return UP;
+    if(y > o.y && y < o.y+o.height) return DOWN;
+    return NONE;
 }
 
 // player
 
 Player::Player() {}
-Player::Player(int _x, int _y): box(_x, _y, sizeBox, sizeBox) {}
+Player::Player(int _x, int _y):
+    box(_x, _y, sizeBox, sizeBox) {}
 
 void Player::render(SDL_Renderer* renderer)
 {
+    cout << box.x << ' ' << box.y << endl;
     box.render(renderer, 8, 99, 255, 26);
 }
 
@@ -64,9 +99,38 @@ void Player::turn(direct dir, int initSpeed)
     box.speed[dir] = initSpeed;
 }
 
-void Player::handle()
+void Player::handle(vector<PlatBasic>& plats)
 {
     box.move();
+    Box pre = box.premove();
+
+    /// BUG HERE
+
+    for(PlatBasic plat : plats) if(box.overlap(plat.box))
+    {
+        if(pre.horizontal(plat.box) == LEFT)
+        {
+            box.x = plat.box.x - sizeBox;
+        }
+        else if(pre.horizontal(plat.box) == RIGHT)
+        {
+            box.x = plat.box.x + plat.box.width;
+        }
+
+        if(pre.vertical(plat.box) == UP)
+        {
+            box.y = plat.box.y - sizeBox;
+            box.state[UP] = box.state[DOWN] = false;
+        }
+        else if(pre.vertical(plat.box) == DOWN)
+        {
+            box.y = plat.box.y + sizeBox;
+            box.state[UP] = false;
+            box.state[DOWN] = true;
+            box.speed[DOWN] = 0;
+        }
+        break;
+    }
 
     box.state[LEFT] = box.state[RIGHT] = false;
     if(box.state[UP])
@@ -82,10 +146,6 @@ void Player::handle()
     if(box.state[DOWN])
     {
         box.speed[DOWN]++;
-        if(box.speed[DOWN] > MAXSPEED)
-        {
-            box.state[DOWN] = false;
-        }
     }
 }
 
@@ -111,21 +171,47 @@ bool Player::death()
 // PlatBasic
 
 PlatBasic::PlatBasic() {}
-PlatBasic::PlatBasic(int _x, int _y, int length): box(_x, _y, sizeBox, length) {}
+PlatBasic::PlatBasic(int _x, int _y, int length):
+    box(_x, _y, length, sizeBox) {}
 
 void PlatBasic::render(SDL_Renderer* renderer)
 {
-    box.render(renderer, 0, 0, 0, 255);
+    box.render(renderer, 33, 187, 114, -52);
 }
 
 // game handling
 
-void present(SDL_Renderer* renderer, Player &player)
+void initGame(vector<PlatBasic>& plats)
+{
+    srand(time(nullptr));
+
+    int len = 60;
+    int x = SCREEN_WIDTH/2 - len/2 + sizeBox/2;
+    int y = initialHeight + sizeBox;
+    PlatBasic plat(x, y, len);
+    plats.push_back(plat);
+
+    int pre = y;
+
+    for(int i = 1; i < 10; i++)
+    {
+        int len = rnd(50, 100);
+        int x = rnd(0, SCREEN_WIDTH - len);
+        int y = rnd(max(sizeBox, pre - 100), pre - sizeBox);
+        PlatBasic plat(x, y, len);
+        plats.push_back(plat);
+        pre = y;
+    }
+}
+
+void present(SDL_Renderer* renderer, Player &player, vector<PlatBasic>& plats)
 {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
 
     player.render(renderer);
+    for(PlatBasic plat : plats) plat.render(renderer);
+
     SDL_RenderPresent(renderer);
 }
 
@@ -137,4 +223,9 @@ bool keyboardEvent(Player& player)
     if(e.type == SDL_KEYDOWN)
         player.keyboardEvent(e);
     return 0;
+}
+
+void handleGame(Player &player, vector<PlatBasic> &plats)
+{
+
 }
