@@ -17,8 +17,8 @@ public:
     int preX, preY;
     int width, height;
 
-    int speed[4] = {1, 1, 1, 1};
-    bool state[4] = {0, 0, 0, 0};
+    int speed[5] = {0, 1, 1, 1, 1};
+    bool state[5] = {0, 0, 0, 0, 0};
 
     Box();
     Box(int _x, int _y, int _w, int _h);

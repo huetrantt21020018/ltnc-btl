@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
         present(renderer, player, plats);
         if(keyboardEvent(player)) break;
         player.handle(plats);
-        handleGame(player, plats);
+//        handleGame(player, plats);
         SDL_Delay(TIME_DELAY);
     }
 

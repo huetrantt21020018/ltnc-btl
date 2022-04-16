@@ -10,8 +10,8 @@ const int SCREEN_WIDTH = 600;
 const int SCREEN_HEIGHT = 700;
 const string WINDOW_TITLE = "LTNC-BTL";
 
-const int TIME_DELAY = 60;
-const int MAXSPEED = 15;
+const int TIME_DELAY = 30;
+const int MAXSPEED = 14;
 const int sizeBox = 15;
 const int initialHeight = 600;
 

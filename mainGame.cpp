@@ -63,20 +63,22 @@ bool Box::insideScreen()
 
 bool Box::overlap(Box o)
 {
-    return (max(x, o.x) < min(x+width, o.x+o.width)
-            && max(y, o.y) < min(y+height, o.y+o.height));
+    return (max(x, o.x) <= min(x+width, o.x+o.width)
+            && max(y, o.y) <= min(y+height, o.y+o.height));
 }
 
 direct Box::horizontal(Box o)
 {
-    if(x < o.x && x+width > o.x) return LEFT;
-    if(x > o.x && x < o.x+o.width) return RIGHT;
+    if(!(max(y, o.y) < min(y+height, o.y+o.height))) return NONE;
+    if(x + sizeBox <= o.x) return LEFT;
+    if(x >= o.x+o.width) return RIGHT;
     return NONE;
 }
 direct Box::vertical(Box o)
 {
-    if(y < o.y && y+height > o.y) return UP;
-    if(y > o.y && y < o.y+o.height) return DOWN;
+    if(!(max(x, o.x) < min(x+width, o.x+o.width))) return NONE;
+    if(y + sizeBox <= o.y) return UP;
+    if(y >= o.y+o.height) return DOWN;
     return NONE;
 }
 
@@ -88,7 +90,7 @@ Player::Player(int _x, int _y):
 
 void Player::render(SDL_Renderer* renderer)
 {
-    cout << box.x << ' ' << box.y << endl;
+    //cout << box.state[UP] << ' ' << box.state[DOWN] << ' ' << box.state[LEFT] << ' ' << box.state[RIGHT] << endl;
     box.render(renderer, 8, 99, 255, 26);
 }
 
@@ -106,47 +108,56 @@ void Player::handle(vector<PlatBasic>& plats)
 
     /// BUG HERE
 
-    for(PlatBasic plat : plats) if(box.overlap(plat.box))
+    bool fall = ~box.state[UP];
+
+    for(PlatBasic plat : plats)
     {
-        if(pre.horizontal(plat.box) == LEFT)
+        if(box.overlap(plat.box)) fall = 0;
+
+        if(pre.horizontal(plat.box) == LEFT && box.horizontal(plat.box) != LEFT && box.state[RIGHT])
         {
-            box.x = plat.box.x - sizeBox;
+            box.x = min(box.x, plat.box.x - sizeBox);
         }
-        else if(pre.horizontal(plat.box) == RIGHT)
+        else if(pre.horizontal(plat.box) == RIGHT && box.horizontal(plat.box) != RIGHT && box.state[LEFT])
         {
-            box.x = plat.box.x + plat.box.width;
+            box.x = max(box.x, plat.box.x + plat.box.width);
         }
 
-        if(pre.vertical(plat.box) == UP)
+        if(pre.vertical(plat.box) == UP && box.vertical(plat.box) != UP && box.state[DOWN])
         {
+            cout << "#";
             box.y = plat.box.y - sizeBox;
             box.state[UP] = box.state[DOWN] = false;
         }
-        else if(pre.vertical(plat.box) == DOWN)
+        else if(pre.vertical(plat.box) == DOWN && box.vertical(plat.box) != DOWN && box.state[UP])
         {
-            box.y = plat.box.y + sizeBox;
-            box.state[UP] = false;
-            box.state[DOWN] = true;
-            box.speed[DOWN] = 0;
+            if(box.y < plat.box.y + sizeBox)
+            {
+                box.y = plat.box.y + sizeBox;
+                box.state[UP] = false;
+                turn(DOWN, 0);
+            }
         }
-        break;
     }
 
+    cout << endl;
+
     box.state[LEFT] = box.state[RIGHT] = false;
+
     if(box.state[UP])
     {
         box.speed[UP]--;
         if(box.speed[UP] < 0)
         {
             box.state[UP] = false;
-            box.state[DOWN] = true;
-            box.speed[DOWN] = 0;
+            turn(DOWN, 0);
         }
     }
     if(box.state[DOWN])
     {
         box.speed[DOWN]++;
     }
+    else if(!box.state[UP] && fall) turn(DOWN, 0);
 }
 
 void Player::keyboardEvent(SDL_Event e)
@@ -156,8 +167,8 @@ void Player::keyboardEvent(SDL_Event e)
     {
         case SDLK_UP: turn(UP, MAXSPEED); break;
 //        case SDLK_DOWN: moveDown(); break;
-        case SDLK_RIGHT: turn(RIGHT, MAXSPEED/3); break;
-        case SDLK_LEFT: turn(LEFT, MAXSPEED/3); break;
+        case SDLK_RIGHT: turn(RIGHT, MAXSPEED/2); break;
+        case SDLK_LEFT: turn(LEFT, MAXSPEED/2); break;
         default: break;
     }
 }
@@ -183,7 +194,7 @@ void PlatBasic::render(SDL_Renderer* renderer)
 
 void initGame(vector<PlatBasic>& plats)
 {
-    srand(time(nullptr));
+    //srand(time(nullptr));
 
     int len = 60;
     int x = SCREEN_WIDTH/2 - len/2 + sizeBox/2;
@@ -191,16 +202,18 @@ void initGame(vector<PlatBasic>& plats)
     PlatBasic plat(x, y, len);
     plats.push_back(plat);
 
-    int pre = y;
+    int preX = x;
+    int preY = y;
 
     for(int i = 1; i < 10; i++)
     {
-        int len = rnd(50, 100);
-        int x = rnd(0, SCREEN_WIDTH - len);
-        int y = rnd(max(sizeBox, pre - 100), pre - sizeBox);
+        int len = rnd(60, 100);
+        int x = rnd(0, 1) ? rnd(max(0, preX - len - sizeBox), preX - sizeBox) : rnd(preX + sizeBox, min(SCREEN_WIDTH, preX + len + sizeBox));
+        int y = rnd(max(3 * sizeBox, preY - 70), preY - sizeBox);
         PlatBasic plat(x, y, len);
         plats.push_back(plat);
-        pre = y;
+        preX = x;
+        preY = y;
     }
 }
 
@@ -223,9 +236,4 @@ bool keyboardEvent(Player& player)
     if(e.type == SDL_KEYDOWN)
         player.keyboardEvent(e);
     return 0;
-}
-
-void handleGame(Player &player, vector<PlatBasic> &plats)
-{
-
 }
