@@ -123,13 +123,13 @@ void Player::handle(vector<PlatBasic>& plats)
             box.x = max(box.x, plat.box.x + plat.box.width);
         }
 
-        if(pre.vertical(plat.box) == UP && box.vertical(plat.box) != UP && box.state[DOWN])
+        if(pre.vertical(plat.box) == UP && box.vertical(plat.box) != UP && box.state[DOWN] && box.overlap(plat.box))
         {
-            cout << "#";
+            cout << "#\n";
             box.y = plat.box.y - sizeBox;
             box.state[UP] = box.state[DOWN] = false;
         }
-        else if(pre.vertical(plat.box) == DOWN && box.vertical(plat.box) != DOWN && box.state[UP])
+        else if(pre.vertical(plat.box) == DOWN && box.vertical(plat.box) != DOWN && box.state[UP] && box.overlap(plat.box))
         {
             if(box.y < plat.box.y + sizeBox)
             {
@@ -139,8 +139,6 @@ void Player::handle(vector<PlatBasic>& plats)
             }
         }
     }
-
-    cout << endl;
 
     box.state[LEFT] = box.state[RIGHT] = false;
 
@@ -196,7 +194,7 @@ void initGame(vector<PlatBasic>& plats)
 {
     //srand(time(nullptr));
 
-    int len = 60;
+    int len = 100;
     int x = SCREEN_WIDTH/2 - len/2 + sizeBox/2;
     int y = initialHeight + sizeBox;
     PlatBasic plat(x, y, len);
@@ -204,16 +202,22 @@ void initGame(vector<PlatBasic>& plats)
 
     int preX = x;
     int preY = y;
+    int prelen = len;
 
     for(int i = 1; i < 10; i++)
     {
-        int len = rnd(60, 100);
-        int x = rnd(0, 1) ? rnd(max(0, preX - len - sizeBox), preX - sizeBox) : rnd(preX + sizeBox, min(SCREEN_WIDTH, preX + len + sizeBox));
-        int y = rnd(max(3 * sizeBox, preY - 70), preY - sizeBox);
+        len = rnd(75, 125);
+        int t = preX < SCREEN_WIDTH / 2 ? 0 : (preX > 2 * SCREEN_WIDTH / 3 - prelen ? 1 : rnd(0, 1) );
+        x = (t == 1) ? rnd(preX - len - 2 * sizeBox, preX + prelen - len - 2 * sizeBox)
+                        : rnd(preX + 2 * sizeBox, preX + prelen + 2 * sizeBox);
+        y = rnd(preY - 5 * sizeBox, preY - 7 * sizeBox);
+
         PlatBasic plat(x, y, len);
         plats.push_back(plat);
+
         preX = x;
         preY = y;
+        prelen = len;
     }
 }
 
