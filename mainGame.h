@@ -4,6 +4,8 @@
 #include "common.h"
 #include <SDL.h>
 #include <vector>
+#include <string>
+#include <fstream>
 
 int rnd(int a, int b);
 
@@ -17,7 +19,7 @@ public:
     int preX, preY;
     int width, height;
 
-    int speed[5] = {0, 1, 1, 1, 1};
+    int speed[5] = {0, 3, 3, 3, 3};
     bool state[5] = {0, 0, 0, 0, 0};
 
     Box();
@@ -25,7 +27,7 @@ public:
 
     void render(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
-    void move();
+    int move();
     Box premove();
 
     bool fallOut();
@@ -36,17 +38,25 @@ public:
     direct vertical(Box o);
 };
 
-class PlatBasic
+class basicPlat
 {
 
 public:
 
     Box box;
+    direct dir;
 
-    PlatBasic();
-    PlatBasic(int _x, int _y, int length);
+    basicPlat();
+    basicPlat(int _x, int _y, int length, direct dir);
+
+    void move();
 
     void render(SDL_Renderer* renderer);
+};
+
+class deadPlat : public basicPlat
+{
+
 };
 
 class Player
@@ -55,6 +65,7 @@ class Player
 public:
 
     Box box;
+    int locate = 0;
 
     Player();
     Player(int _x, int _y);
@@ -62,21 +73,21 @@ public:
     void render(SDL_Renderer* renderer);
 
     void turn(direct dir, int initSpeed);
-    void handle(vector<PlatBasic>& plats);
+    void handle(vector<basicPlat>& plats);
     void keyboardEvent(SDL_Event e);
 
     bool death();
 
-    bool meetPlat(PlatBasic &plat);
+    bool meetPlat(basicPlat &plat);
 };
 
-void initGame(vector<PlatBasic>& plats);
+void initGame(vector<basicPlat>& plats, int level);
 
-void present(SDL_Renderer* renderer, Player &box, vector<PlatBasic> &plats);
+void present(SDL_Renderer* renderer, Player &box, vector<basicPlat> &plats);
 
 bool keyboardEvent(Player& player);
 
-void handleGame(Player &player, vector<PlatBasic> &plats);
+void handleGame(Player &player, vector<basicPlat> &plats);
 
 
 #endif // MAIN_GAME

@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1650080224 source:c:\users\sinhvienuet\ltnc\btl\main.cpp
+1651552773 source:c:\users\sinhvienuet\ltnc\btl\main.cpp
 	<SDL.h>
 	<iostream>
 	<vector>
@@ -16,20 +16,24 @@
 	<SDL.h>
 	"SDL_utils.h"
 
-1650079692 c:\users\sinhvienuet\ltnc\btl\common.h
+1651552155 c:\users\sinhvienuet\ltnc\btl\common.h
 	<string>
 	"common.h"
 
-1650079671 c:\users\sinhvienuet\ltnc\btl\maingame.h
+1651552754 c:\users\sinhvienuet\ltnc\btl\maingame.h
 	"common.h"
 	<SDL.h>
 	<vector>
+	<string>
+	<fstream>
 
-1650788377 source:c:\users\sinhvienuet\ltnc\btl\maingame.cpp
+1651552754 source:c:\users\sinhvienuet\ltnc\btl\maingame.cpp
 	"mainGame.h"
 	<iostream>
 	<stdlib.h>
 	<time.h>
+	<fstream>
+	<string>
 	"common.h"
 	"mainGame.h"
 

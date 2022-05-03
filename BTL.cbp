@@ -36,6 +36,10 @@
 		<Unit filename="SDL_utils.cpp" />
 		<Unit filename="SDL_utils.h" />
 		<Unit filename="common.h" />
+		<Unit filename="level1.txt" />
+		<Unit filename="level2.txt" />
+		<Unit filename="level3.txt" />
+		<Unit filename="level4.txt" />
 		<Unit filename="libjpeg-9.dll" />
 		<Unit filename="libpng16-16.dll" />
 		<Unit filename="libtiff-5.dll" />

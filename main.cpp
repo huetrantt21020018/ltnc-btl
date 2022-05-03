@@ -19,8 +19,8 @@ int main(int argc, char* argv[]) {
     // init game
 
     Player player(SCREEN_WIDTH/2, initialHeight);
-    vector<PlatBasic> plats;
-    initGame(plats);
+    vector<basicPlat> plats;
+    initGame(plats, 4);
 
     // game loop
 

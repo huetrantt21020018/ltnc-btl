@@ -2,6 +2,8 @@
 #include <iostream>
 #include <stdlib.h>
 #include <time.h>
+#include <fstream>
+#include <string>
 
 #include "common.h"
 #include "mainGame.h"
@@ -18,6 +20,7 @@ Box::Box(int _x, int _y, int _w, int _h):
 
 void Box::render(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 {
+   // cout << x << ' ' << y << endl;
     SDL_Rect filled_rect;
     filled_rect.x = x;
     filled_rect.y = y;
@@ -27,7 +30,7 @@ void Box::render(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
     SDL_RenderFillRect(renderer, &filled_rect);
 }
 
-void Box::move()
+int Box::move()
 {
     preX = x;
     preY = y;
@@ -42,6 +45,8 @@ void Box::move()
         x = min(x, SCREEN_WIDTH - width);
         y = min(y, SCREEN_HEIGHT - height);
     }
+    if(preX == x && preY == y) return 0;
+    return 1;
 }
 
 Box Box::premove()
@@ -101,17 +106,28 @@ void Player::turn(direct dir, int initSpeed)
     box.speed[dir] = initSpeed;
 }
 
-void Player::handle(vector<PlatBasic>& plats)
+void Player::handle(vector<basicPlat>& plats)
 {
     box.move();
     Box pre = box.premove();
 
-    /// BUG HERE
-
     bool fall = ~box.state[UP];
 
-    for(PlatBasic plat : plats)
+    int n = plats.size();
+
+    for(int i = 0; i < n; i++)
     {
+        plats[i].move();
+        if(i == locate)
+        {
+            Box tmp = plats[i].box.premove();
+            box.x -= tmp.x - plats[i].box.x;
+            box.y -= tmp.y - plats[i].box.y;
+        }
+    }
+    for(int i = 0; i < n; i++)
+    {
+        basicPlat plat = plats[i];
         if(box.overlap(plat.box)) fall = 0;
 
         if(pre.horizontal(plat.box) == LEFT && box.horizontal(plat.box) != LEFT && box.state[RIGHT])
@@ -125,7 +141,7 @@ void Player::handle(vector<PlatBasic>& plats)
 
         if(pre.vertical(plat.box) == UP && box.vertical(plat.box) != UP && box.state[DOWN] && box.overlap(plat.box))
         {
-            cout << "#\n";
+            locate = i;
             box.y = plat.box.y - sizeBox;
             box.state[UP] = box.state[DOWN] = false;
         }
@@ -156,6 +172,7 @@ void Player::handle(vector<PlatBasic>& plats)
         box.speed[DOWN]++;
     }
     else if(!box.state[UP] && fall) turn(DOWN, 0);
+
 }
 
 void Player::keyboardEvent(SDL_Event e)
@@ -165,8 +182,8 @@ void Player::keyboardEvent(SDL_Event e)
     {
         case SDLK_UP: turn(UP, MAXSPEED); break;
 //        case SDLK_DOWN: moveDown(); break;
-        case SDLK_RIGHT: turn(RIGHT, MAXSPEED/2); break;
-        case SDLK_LEFT: turn(LEFT, MAXSPEED/2); break;
+        case SDLK_RIGHT: turn(RIGHT, sizeBox - 1); break;
+        case SDLK_LEFT: turn(LEFT, sizeBox - 1); break;
         default: break;
     }
 }
@@ -177,57 +194,65 @@ bool Player::death()
     return 0;
 }
 
-// PlatBasic
+// basicPlat
 
-PlatBasic::PlatBasic() {}
-PlatBasic::PlatBasic(int _x, int _y, int length):
-    box(_x, _y, length, sizeBox) {}
+basicPlat::basicPlat() {}
+basicPlat::basicPlat(int _x, int _y, int length, direct _dir):
+    box(_x, _y, length, sizeBox) {box.state[_dir] = 1; dir = _dir;}
 
-void PlatBasic::render(SDL_Renderer* renderer)
+void basicPlat::render(SDL_Renderer* renderer)
 {
     box.render(renderer, 33, 187, 114, -52);
 }
 
+void basicPlat::move()
+{
+    //cout << "# " << box.x << ' ' << box.y << endl;
+    if(!box.move())
+    {
+        box.state[dir] = false;
+        dir = opposite[dir];
+        box.state[dir] = true;
+    }
+    //cout << "## " << box.x << ' ' << box.y << endl;
+}
+
 // game handling
 
-void initGame(vector<PlatBasic>& plats)
+void initGame(vector<basicPlat>& plats, int level)
 {
     //srand(time(nullptr));
 
-    int len = 100;
-    int x = SCREEN_WIDTH/2 - len/2 + sizeBox/2;
-    int y = initialHeight + sizeBox;
-    PlatBasic plat(x, y, len);
-    plats.push_back(plat);
+    string s1 = "level";
+    string s2 = to_string(level);
+    string s3 = ".txt";
 
-    int preX = x;
-    int preY = y;
-    int prelen = len;
+    string fileName = s1 + s2 + s3;
+    cout << fileName << endl;
+    ifstream inFile(fileName);
 
-    for(int i = 1; i < 10; i++)
+    int n;
+    inFile >> n;
+
+    for(int i = 0; i < n; ++i)
     {
-        len = rnd(75, 125);
-        int t = preX < SCREEN_WIDTH / 2 ? 0 : (preX > 2 * SCREEN_WIDTH / 3 - prelen ? 1 : rnd(0, 1) );
-        x = (t == 1) ? rnd(preX - len - 2 * sizeBox, preX + prelen - len - 2 * sizeBox)
-                        : rnd(preX + 2 * sizeBox, preX + prelen + 2 * sizeBox);
-        y = rnd(preY - 5 * sizeBox, preY - 7 * sizeBox);
-
-        PlatBasic plat(x, y, len);
+        int x, y, len, d;
+        direct dir;
+        inFile >> x >> y >> len >> d;
+        dir = direct(d);
+        cout << dir << endl;
+        basicPlat plat(x, y, len, dir);
         plats.push_back(plat);
-
-        preX = x;
-        preY = y;
-        prelen = len;
     }
 }
 
-void present(SDL_Renderer* renderer, Player &player, vector<PlatBasic>& plats)
+void present(SDL_Renderer* renderer, Player &player, vector<basicPlat>& plats)
 {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
 
     player.render(renderer);
-    for(PlatBasic plat : plats) plat.render(renderer);
+    for(basicPlat plat : plats) plat.render(renderer);
 
     SDL_RenderPresent(renderer);
 }
