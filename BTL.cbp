@@ -31,8 +31,12 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="LICENSE.freetype.txt" />
+		<Unit filename="LICENSE.harfbuzz.txt" />
+		<Unit filename="LICENSE.zlib.txt" />
 		<Unit filename="SDL2.dll" />
 		<Unit filename="SDL2_image.dll" />
+		<Unit filename="SDL2_ttf.dll" />
 		<Unit filename="SDL_utils.cpp" />
 		<Unit filename="SDL_utils.h" />
 		<Unit filename="common.h" />
@@ -47,6 +51,14 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="mainGame.cpp" />
 		<Unit filename="mainGame.h" />
+		<Unit filename="penguinFall.png" />
+		<Unit filename="penguinJump.png" />
+		<Unit filename="penguinLeft.png" />
+		<Unit filename="penguinNomal.png" />
+		<Unit filename="penguinRight.png" />
+		<Unit filename="readme.txt" />
+		<Unit filename="text_object.cpp" />
+		<Unit filename="text_object.h" />
 		<Unit filename="zlib1.dll" />
 		<Extensions>
 			<code_completion />

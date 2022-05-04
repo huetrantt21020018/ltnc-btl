@@ -1,34 +1,37 @@
 # depslib dependency file v1.0
-1651552773 source:c:\users\sinhvienuet\ltnc\btl\main.cpp
+1651636899 source:c:\users\sinhvienuet\ltnc\btl\main.cpp
 	<SDL.h>
+	<SDL_ttf.h>
 	<iostream>
 	<vector>
 	"common.h"
 	"SDL_utils.h"
 	"mainGame.h"
+	"text_object.h"
 
-1648219811 source:c:\users\sinhvienuet\ltnc\btl\sdl_utils.cpp
+1651591384 source:c:\users\sinhvienuet\ltnc\btl\sdl_utils.cpp
 	"SDL_utils.h"
 	<iostream>
+	<SDL_image.h>
 
-1648214652 c:\users\sinhvienuet\ltnc\btl\sdl_utils.h
+1651590033 c:\users\sinhvienuet\ltnc\btl\sdl_utils.h
 	<iostream>
 	<SDL.h>
 	"SDL_utils.h"
 
-1651552155 c:\users\sinhvienuet\ltnc\btl\common.h
+1651636520 c:\users\sinhvienuet\ltnc\btl\common.h
 	<string>
 	"common.h"
 
-1651552754 c:\users\sinhvienuet\ltnc\btl\maingame.h
+1651641640 c:\users\sinhvienuet\ltnc\btl\maingame.h
 	"common.h"
 	<SDL.h>
+	<SDL_image.h>
 	<vector>
 	<string>
 	<fstream>
 
-1651552754 source:c:\users\sinhvienuet\ltnc\btl\maingame.cpp
-	"mainGame.h"
+1651636899 source:c:\users\sinhvienuet\ltnc\btl\maingame.cpp
 	<iostream>
 	<stdlib.h>
 	<time.h>
@@ -36,4 +39,18 @@
 	<string>
 	"common.h"
 	"mainGame.h"
+	"SDL_utils.h"
+
+1651591400 source:c:\users\sinhvienuet\ltnc\btl\text_object.cpp
+	<SDL.h>
+	<SDL_ttf.h>
+
+1651569648 c:\users\sinhvienuet\ltnc\btl\text_object.h
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_ttf.h>
+	<stdio.h>
+	<string>
+	<cmath>
+	"text_Object.h"
 

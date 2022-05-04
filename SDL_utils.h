@@ -16,4 +16,6 @@ void quitSDL(SDL_Window* window, SDL_Renderer* renderer);
 
 void waitUntilKeyPressed();
 
+SDL_Texture* loadTexture (string path, SDL_Renderer* renderer);
+
 #endif // SDL_UTILS

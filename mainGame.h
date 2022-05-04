@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include <SDL.h>
+#include <SDL_image.h>
 #include <vector>
 #include <string>
 #include <fstream>
@@ -54,9 +55,17 @@ public:
     void render(SDL_Renderer* renderer);
 };
 
-class deadPlat : public basicPlat
+class deadPlat
 {
 
+public:
+
+    Box box;
+
+    deadPlat();
+    deadPlat(int _x, int _y, int length);
+
+    void render(SDL_Renderer* renderer);
 };
 
 class Player
@@ -66,6 +75,7 @@ public:
 
     Box box;
     int locate = 0;
+    bool fall;
 
     Player();
     Player(int _x, int _y);
@@ -76,14 +86,16 @@ public:
     void handle(vector<basicPlat>& plats);
     void keyboardEvent(SDL_Event e);
 
-    bool death();
+    void prepare();
+
+    bool death(vector<deadPlat>& dPlats);
 
     bool meetPlat(basicPlat &plat);
 };
 
-void initGame(vector<basicPlat>& plats, int level);
+void initGame(vector<basicPlat>& plats, vector<deadPlat>& dPlats, int level);
 
-void present(SDL_Renderer* renderer, Player &box, vector<basicPlat> &plats);
+void present(SDL_Renderer* renderer, Player &box, vector<basicPlat> &plats, vector<deadPlat>& dPlats, int level);
 
 bool keyboardEvent(Player& player);
 
