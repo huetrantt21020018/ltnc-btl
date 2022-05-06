@@ -90,17 +90,22 @@ direct Box::vertical(Box o)
 // player
 
 Player::Player() {}
-Player::Player(int _x, int _y):
-    box(_x, _y, 3 * sizeBox / 2, 3 * sizeBox / 2) {}
+Player::Player(int _x, int _y, SDL_Renderer* renderer): box(_x, _y, 3 * sizeBox / 2, 3 * sizeBox / 2) {
+    penguinNomal = loadTexture("penguinNomal.png", renderer);
+    penguinJump = loadTexture("penguinJump.png", renderer);
+    penguinFall = loadTexture("penguinFall.png", renderer);
+    penguinLeft = loadTexture("penguinLeft.png", renderer);
+    penguinRight = loadTexture("penguinRight.png", renderer);
+}
 
 void Player::render(SDL_Renderer* renderer)
 {
     // box.render(renderer, 8, 99, 255, 26);
-    SDL_Texture* penguin = loadTexture("penguinNomal.png", renderer);
-    if(box.state[UP]) penguin = loadTexture("penguinJump.png", renderer);
-    else if(box.state[DOWN]) penguin = loadTexture("penguinFall.png", renderer);
-    else if(box.state[LEFT]) penguin = loadTexture("penguinLeft.png", renderer);
-    else if(box.state[RIGHT]) penguin = loadTexture("penguinRight.png", renderer);
+    SDL_Texture* penguin = penguinNomal;
+    if(box.state[UP]) penguin = penguinJump;
+    else if(box.state[DOWN]) penguin = penguinFall;
+    else if(box.state[LEFT]) penguin = penguinLeft;
+    else if(box.state[RIGHT]) penguin = penguinRight;
 
     SDL_Rect penRect;
     penRect.x = box.x;
@@ -138,7 +143,7 @@ void Player::prepare()
     else if(!box.state[UP] && fall) turn(DOWN, 0);
 }
 
-void Player::handle(vector<basicPlat>& plats)
+bool Player::handle(vector<basicPlat>& plats, goalPlat& gplat, int& level)
 {
     box.move();
 
@@ -189,6 +194,12 @@ void Player::handle(vector<basicPlat>& plats)
         }
     }
 
+    if(box.overlap(gplat.box))
+    {
+        level++;
+        return 1;
+    }
+    return 0;
 }
 
 void Player::keyboardEvent(SDL_Event e)
@@ -234,6 +245,19 @@ void basicPlat::move()
     //cout << "## " << box.x << ' ' << box.y << endl;
 }
 
+
+// goal Plat
+
+goalPlat::goalPlat() {}
+goalPlat::goalPlat(int _x, int _y, int length):
+    box(_x, _y, length, sizeBox) {}
+
+void goalPlat::render(SDL_Renderer* renderer)
+{
+    box.render(renderer, 252, 103, 99, 56);
+}
+
+
 // dead Plat
 
 deadPlat::deadPlat() {}
@@ -248,21 +272,46 @@ void deadPlat::render(SDL_Renderer* renderer)
 
 // game handling
 
-void initGame(vector<basicPlat>& plats, vector<deadPlat>& dPlats, int level)
+void prepareNewLevel(int level, SDL_Renderer* renderer, SDL_Texture* &background)
+{
+    string s1 = "background";
+    string s2 = to_string(level);
+    string s3 = ".png";
+    string fileName = s1 + s2 + s3;
+
+    background = loadTexture(fileName, renderer);
+
+    s1 = "signLevel";
+    fileName = s1 + s2 + s3;
+    SDL_Texture* sign = loadTexture(fileName, renderer);
+
+    SDL_Rect signRect;
+    SDL_QueryTexture(sign, NULL, NULL, &signRect.w, &signRect.h);
+    signRect.x = 75;
+    signRect.y = 0;
+
+    SDL_RenderCopy(renderer, sign, NULL, &signRect);
+    SDL_RenderPresent(renderer);
+    SDL_Delay(1000);
+}
+
+void initGame(Player& player, vector<basicPlat>& plats, vector<deadPlat>& dPlats, goalPlat& gplat, int level, SDL_Renderer* renderer)
 {
     //srand(time(nullptr));
+
+    player = Player((SCREEN_WIDTH + 5*sizeBox)/2, initialHeight, renderer);
 
     string s1 = "level";
     string s2 = to_string(level);
     string s3 = ".txt";
 
     string fileName = s1 + s2 + s3;
-    cout << fileName << endl;
     ifstream inFile(fileName);
 
     int n;
     inFile >> n;
 
+    plats.clear();
     for(int i = 0; i < n; ++i)
     {
         int x, y, len, d;
@@ -273,6 +322,7 @@ void initGame(vector<basicPlat>& plats, vector<deadPlat>& dPlats, int level)
         plats.push_back(plat);
     }
 
+    dPlats.clear();
     inFile >> n;
     for(int i = 0; i < n; ++i)
     {
@@ -281,24 +331,24 @@ void initGame(vector<basicPlat>& plats, vector<deadPlat>& dPlats, int level)
         deadPlat plat(x, y, len);
         dPlats.push_back(plat);
     }
+
+    int x, y, len;
+    inFile >> x >> y >> len;
+    gplat = goalPlat(x, y, len);
 }
 
-void present(SDL_Renderer* renderer, Player &player, vector<basicPlat>& plats, vector<deadPlat>& dPlats, int level)
+void present(SDL_Renderer* renderer, SDL_Texture* background, Player &player, vector<basicPlat>& plats, vector<deadPlat>& dPlats, goalPlat& gplat)
 {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
 
-    string s1 = "background";
-    string s2 = to_string(level);
-    string s3 = ".png";
-    string fileName = s1 + s2 + s3;
-
-    SDL_Texture* background = loadTexture(fileName, renderer);
     SDL_RenderCopy(renderer, background, NULL, NULL);
 
-    player.render(renderer);
     for(basicPlat plat : plats) plat.render(renderer);
     for(deadPlat plat : dPlats) plat.render(renderer);
+    gplat.render(renderer);
+
+    player.render(renderer);
 
     SDL_RenderPresent(renderer);
 }
@@ -311,4 +361,26 @@ bool keyboardEvent(Player& player)
     if(e.type == SDL_KEYDOWN)
         player.keyboardEvent(e);
     return 0;
+}
+
+void endGame(game Game, SDL_Renderer* renderer)
+{
+    SDL_Texture* sign = loadTexture("signStart.png", renderer);
+    if(Game == LOSE) sign =  loadTexture("signFail.png", renderer);
+    if(Game == WIN) sign = loadTexture("signWin.png", renderer);
+
+    SDL_Rect signRect;
+    SDL_QueryTexture(sign, NULL, NULL, &signRect.w, &signRect.h);
+    signRect.x = 75;
+    signRect.y = SCREEN_HEIGHT - signRect.h + 20;
+
+    SDL_RenderCopy(renderer, sign, NULL, &signRect);
+    SDL_RenderPresent(renderer);
+
+    SDL_Event e;
+    do {
+        if(SDL_WaitEvent(&e) != 0 && e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_RETURN)
+            break;
+        SDL_Delay(100);
+    } while(true);
 }

@@ -10,7 +10,6 @@
 
 int rnd(int a, int b);
 
-
 class Box
 {
 
@@ -55,6 +54,18 @@ public:
     void render(SDL_Renderer* renderer);
 };
 
+class goalPlat
+{
+public:
+
+    Box box;
+
+    goalPlat();
+    goalPlat(int _x, int _y, int length);
+
+    void render(SDL_Renderer* renderer);
+};
+
 class deadPlat
 {
 
@@ -73,17 +84,23 @@ class Player
 
 public:
 
+    SDL_Texture* penguinNomal;
+    SDL_Texture* penguinJump;
+    SDL_Texture* penguinFall;
+    SDL_Texture* penguinLeft;
+    SDL_Texture* penguinRight;
+
     Box box;
-    int locate = 0;
+    int locate = 0, score = 0;
     bool fall;
 
     Player();
-    Player(int _x, int _y);
+    Player(int _x, int _y, SDL_Renderer* renderer);
 
     void render(SDL_Renderer* renderer);
 
     void turn(direct dir, int initSpeed);
-    void handle(vector<basicPlat>& plats);
+    bool handle(vector<basicPlat>& plats, goalPlat& gplat, int& level);
     void keyboardEvent(SDL_Event e);
 
     void prepare();
@@ -93,14 +110,15 @@ public:
     bool meetPlat(basicPlat &plat);
 };
 
-void initGame(vector<basicPlat>& plats, vector<deadPlat>& dPlats, int level);
+void prepareNewLevel(int level, SDL_Renderer* renderer, SDL_Texture* &background);
 
-void present(SDL_Renderer* renderer, Player &box, vector<basicPlat> &plats, vector<deadPlat>& dPlats, int level);
+void initGame(Player& player, vector<basicPlat>& plats, vector<deadPlat>& dPlats, goalPlat& gplat, int level, SDL_Renderer* renderer);
+
+void present(SDL_Renderer* renderer, SDL_Texture* background, Player &box, vector<basicPlat> &plats, vector<deadPlat>& dPlats, goalPlat& gplat);
 
 bool keyboardEvent(Player& player);
 
-void handleGame(Player &player, vector<basicPlat> &plats);
-
+void endGame(game Game, SDL_Renderer* renderer);
 
 #endif // MAIN_GAME
 

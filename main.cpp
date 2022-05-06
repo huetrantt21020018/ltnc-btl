@@ -17,30 +17,47 @@ int main(int argc, char* argv[]) {
 
     SDL_Window* window;
     SDL_Renderer* renderer;
-//    TTF_Font* font = NULL;
-//    LTexture textTexture;
 
     initSDL(window, renderer, SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE);
 
     // init game
 
-    Player player((SCREEN_WIDTH + 5*sizeBox)/2, initialHeight);
+    Player player((SCREEN_WIDTH + 5*sizeBox)/2, initialHeight, renderer);
     vector<basicPlat> plats;
     vector<deadPlat> dPlats;
+    goalPlat gplat;
 
     int level = 1;
-    initGame(plats, dPlats, level);
+    initGame(player, plats, dPlats, gplat, level, renderer);
+
+    SDL_Texture* background = loadTexture("background1.png", renderer);
+
+    present(renderer, background, player, plats, dPlats, gplat);
+    endGame(START, renderer);
+    present(renderer, background, player, plats, dPlats, gplat);
+    prepareNewLevel(level, renderer, background);
 
     // game loop
 
     while(!player.death(dPlats)) {
-        present(renderer, player, plats, dPlats, level);
+        present(renderer, background, player, plats, dPlats, gplat);
         player.prepare();
         if(keyboardEvent(player)) break;
-        player.handle(plats);
+        if(player.handle(plats, gplat, level) && level <= 3)
+        {
+            initGame(player, plats, dPlats, gplat, level, renderer);
+            present(renderer, background, player, plats, dPlats, gplat);
+            prepareNewLevel(level, renderer, background);
+        }
+        if(level > 3) break;
         SDL_Delay(TIME_DELAY);
     }
-    present(renderer, player, plats, dPlats, level);
+
+    present(renderer, background, player, plats, dPlats, gplat);
+    SDL_Delay(1000);
+
+    if(player.death(dPlats)) endGame(LOSE, renderer);
+    else endGame(WIN, renderer);
 
     waitUntilKeyPressed();
     quitSDL(window, renderer);
