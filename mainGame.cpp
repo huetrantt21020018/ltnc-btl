@@ -90,12 +90,13 @@ direct Box::vertical(Box o)
 // player
 
 Player::Player() {}
-Player::Player(int _x, int _y, SDL_Renderer* renderer): box(_x, _y, 3 * sizeBox / 2, 3 * sizeBox / 2) {
+Player::Player(int _x, int _y, int _score, SDL_Renderer* renderer): box(_x, _y, 3 * sizeBox / 2, 3 * sizeBox / 2) {
+    score = _score;
     penguinNomal = loadTexture("penguinNomal.png", renderer);
     penguinJump = loadTexture("penguinJump.png", renderer);
     penguinFall = loadTexture("penguinFall.png", renderer);
-    penguinLeft = loadTexture("penguinLeft.png", renderer);
-    penguinRight = loadTexture("penguinRight.png", renderer);
+ //   penguinLeft = loadTexture("penguinLeft.png", renderer);
+ //   penguinRight = loadTexture("penguinRight.png", renderer);
 }
 
 void Player::render(SDL_Renderer* renderer)
@@ -104,8 +105,8 @@ void Player::render(SDL_Renderer* renderer)
     SDL_Texture* penguin = penguinNomal;
     if(box.state[UP]) penguin = penguinJump;
     else if(box.state[DOWN]) penguin = penguinFall;
-    else if(box.state[LEFT]) penguin = penguinLeft;
-    else if(box.state[RIGHT]) penguin = penguinRight;
+    //else if(box.state[LEFT]) penguin = penguinLeft;
+    //else if(box.state[RIGHT]) penguin = penguinRight;
 
     SDL_Rect penRect;
     penRect.x = box.x;
@@ -143,7 +144,7 @@ void Player::prepare()
     else if(!box.state[UP] && fall) turn(DOWN, 0);
 }
 
-bool Player::handle(vector<basicPlat>& plats, goalPlat& gplat, int& level)
+bool Player::handle(vector<basicPlat>& plats, destinyPlat& dplat, int& level)
 {
     box.move();
 
@@ -194,7 +195,7 @@ bool Player::handle(vector<basicPlat>& plats, goalPlat& gplat, int& level)
         }
     }
 
-    if(box.overlap(gplat.box))
+    if(box.overlap(dplat.box))
     {
         level++;
         return 1;
@@ -215,10 +216,16 @@ void Player::keyboardEvent(SDL_Event e)
     }
 }
 
-bool Player::death(vector<deadPlat>& dPlats)
+bool Player::death(vector<deadPlat>& dPlats, vector<goalPlat>& gPlats)
 {
     if (box.fallOut()) return 1;
     for(deadPlat plat : dPlats) if(box.overlap(plat.box)) return 1;
+    for(goalPlat &plat : gPlats) if(plat.exist && box.overlap(plat.box))
+    {
+        score++;
+        cout << score << endl;
+        plat.exist = false;
+    }
     return 0;
 }
 
@@ -245,30 +252,75 @@ void basicPlat::move()
     //cout << "## " << box.x << ' ' << box.y << endl;
 }
 
-
 // goal Plat
 
 goalPlat::goalPlat() {}
-goalPlat::goalPlat(int _x, int _y, int length):
-    box(_x, _y, length, sizeBox) {}
+goalPlat::goalPlat(int _x, int _y, SDL_Renderer* renderer) : box(_x, _y, sizeBox, sizeBox)
+{
+    glPlat = loadTexture("coin.jpg", renderer);
+}
 
 void goalPlat::render(SDL_Renderer* renderer)
 {
-    box.render(renderer, 252, 103, 99, 56);
+//    box.render(renderer, 252, 103, 99, 56);
+    SDL_Texture* plat = glPlat;
+
+    SDL_Rect platRect;
+    SDL_QueryTexture(plat, NULL, NULL, &platRect.w, &platRect.h);
+    platRect.x = box.x;
+    platRect.y = box.y;
+    platRect.w = box.width;
+    platRect.h = box.height;
+
+    SDL_RenderCopy(renderer, plat, NULL, &platRect);
+}
+
+// destiny Plat
+
+destinyPlat::destinyPlat() {}
+destinyPlat::destinyPlat(int _x, int _y, SDL_Renderer* renderer) : box(_x, _y, sizeBox, sizeBox)
+{
+    desPlat = loadTexture("tornado.jpg", renderer);
+}
+
+void destinyPlat::render(SDL_Renderer* renderer)
+{
+//    box.render(renderer, 252, 103, 99, 56);
+    SDL_Texture* plat = desPlat;
+
+    SDL_Rect platRect;
+    SDL_QueryTexture(plat, NULL, NULL, &platRect.w, &platRect.h);
+    platRect.x = box.x;
+    platRect.y = box.y;
+    platRect.w = box.width;
+    platRect.h = box.height;
+
+    SDL_RenderCopy(renderer, plat, NULL, &platRect);
 }
 
 
 // dead Plat
 
 deadPlat::deadPlat() {}
-deadPlat::deadPlat(int _x, int _y, int length):
-    box(_x, _y, length, sizeBox) {}
+deadPlat::deadPlat(int _x, int _y, int length, SDL_Renderer* renderer) : box(_x, _y, length, sizeBox)
+{
+    DeadPlat = loadTexture("deadPlat.jpg", renderer);
+}
 
 void deadPlat::render(SDL_Renderer* renderer)
 {
-    box.render(renderer, 246, 17, 96, 78);
-}
+    // box.render(renderer, 8, 99, 255, 26);
+    SDL_Texture* plat = DeadPlat;
 
+    SDL_Rect platRect;
+    SDL_QueryTexture(plat, NULL, NULL, &platRect.w, &platRect.h);
+    platRect.x = box.x;
+    platRect.y = box.y;
+    platRect.w = box.width;
+    platRect.h = box.height;
+
+    SDL_RenderCopy(renderer, plat, NULL, &platRect);
+}
 
 // game handling
 
@@ -295,11 +347,11 @@ void prepareNewLevel(int level, SDL_Renderer* renderer, SDL_Texture* &background
     SDL_Delay(1000);
 }
 
-void initGame(Player& player, vector<basicPlat>& plats, vector<deadPlat>& dPlats, goalPlat& gplat, int level, SDL_Renderer* renderer)
+void initGame(Player& player, vector<basicPlat>& plats, vector<deadPlat>& dPlats, vector<goalPlat>& gPlats, destinyPlat& dplat, int level, SDL_Renderer* renderer)
 {
     //srand(time(nullptr));
 
-    player = Player((SCREEN_WIDTH + 5*sizeBox)/2, initialHeight, renderer);
+    player = Player((SCREEN_WIDTH + 5*sizeBox)/2, initialHeight, player.score, renderer);
 
     string s1 = "level";
     string s2 = to_string(level);
@@ -328,16 +380,26 @@ void initGame(Player& player, vector<basicPlat>& plats, vector<deadPlat>& dPlats
     {
         int x, y, len;
         inFile >> x >> y >> len;
-        deadPlat plat(x, y, len);
+        deadPlat plat(x, y, len, renderer);
         dPlats.push_back(plat);
+    }
+
+    gPlats.clear();
+    inFile >> n;
+    for(int i = 0; i < n; ++i)
+    {
+        int x, y;
+        inFile >> x >> y;
+        goalPlat plat(x, y, renderer);
+        gPlats.push_back(plat);
     }
 
     int x, y, len;
     inFile >> x >> y >> len;
-    gplat = goalPlat(x, y, len);
+    dplat = destinyPlat(x, y, renderer);
 }
 
-void present(SDL_Renderer* renderer, SDL_Texture* background, Player &player, vector<basicPlat>& plats, vector<deadPlat>& dPlats, goalPlat& gplat)
+void present(SDL_Renderer* renderer, SDL_Texture* background, Player &player, vector<basicPlat>& plats, vector<deadPlat>& dPlats, vector<goalPlat>& gPlats, destinyPlat& dplat)
 {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
@@ -346,7 +408,8 @@ void present(SDL_Renderer* renderer, SDL_Texture* background, Player &player, ve
 
     for(basicPlat plat : plats) plat.render(renderer);
     for(deadPlat plat : dPlats) plat.render(renderer);
-    gplat.render(renderer);
+    for(goalPlat plat : gPlats) if(plat.exist) plat.render(renderer);
+    dplat.render(renderer);
 
     player.render(renderer);
 

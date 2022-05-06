@@ -22,41 +22,42 @@ int main(int argc, char* argv[]) {
 
     // init game
 
-    Player player((SCREEN_WIDTH + 5*sizeBox)/2, initialHeight, renderer);
+    Player player((SCREEN_WIDTH + 5*sizeBox)/2, initialHeight, 0, renderer);
     vector<basicPlat> plats;
     vector<deadPlat> dPlats;
-    goalPlat gplat;
+    vector<goalPlat> gPlats;
+    destinyPlat dplat;
 
     int level = 1;
-    initGame(player, plats, dPlats, gplat, level, renderer);
+    initGame(player, plats, dPlats, gPlats, dplat, level, renderer);
 
     SDL_Texture* background = loadTexture("background1.png", renderer);
 
-    present(renderer, background, player, plats, dPlats, gplat);
+    present(renderer, background, player, plats, dPlats, gPlats, dplat);
     endGame(START, renderer);
-    present(renderer, background, player, plats, dPlats, gplat);
+    present(renderer, background, player, plats, dPlats, gPlats, dplat);
     prepareNewLevel(level, renderer, background);
 
     // game loop
 
-    while(!player.death(dPlats)) {
-        present(renderer, background, player, plats, dPlats, gplat);
+    while(!player.death(dPlats, gPlats)) {
+        present(renderer, background, player, plats, dPlats, gPlats, dplat);
         player.prepare();
         if(keyboardEvent(player)) break;
-        if(player.handle(plats, gplat, level) && level <= 3)
+        if(player.handle(plats, dplat, level) && level <= 3)
         {
-            initGame(player, plats, dPlats, gplat, level, renderer);
-            present(renderer, background, player, plats, dPlats, gplat);
+            initGame(player, plats, dPlats, gPlats, dplat, level, renderer);
+            present(renderer, background, player, plats, dPlats, gPlats, dplat);
             prepareNewLevel(level, renderer, background);
         }
         if(level > 3) break;
         SDL_Delay(TIME_DELAY);
     }
 
-    present(renderer, background, player, plats, dPlats, gplat);
+    present(renderer, background, player, plats, dPlats, gPlats, dplat);
     SDL_Delay(1000);
 
-    if(player.death(dPlats)) endGame(LOSE, renderer);
+    if(player.death(dPlats, gPlats)) endGame(LOSE, renderer);
     else endGame(WIN, renderer);
 
     waitUntilKeyPressed();

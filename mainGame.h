@@ -54,14 +54,29 @@ public:
     void render(SDL_Renderer* renderer);
 };
 
+class destinyPlat
+{
+public:
+
+    Box box;
+    SDL_Texture* desPlat;
+
+    destinyPlat();
+    destinyPlat(int _x, int _y, SDL_Renderer* renderer);
+
+    void render(SDL_Renderer* renderer);
+};
+
 class goalPlat
 {
 public:
 
     Box box;
+    SDL_Texture* glPlat;
+    bool exist = true;
 
     goalPlat();
-    goalPlat(int _x, int _y, int length);
+    goalPlat(int _x, int _y, SDL_Renderer* renderer);
 
     void render(SDL_Renderer* renderer);
 };
@@ -72,9 +87,10 @@ class deadPlat
 public:
 
     Box box;
+    SDL_Texture* DeadPlat;
 
     deadPlat();
-    deadPlat(int _x, int _y, int length);
+    deadPlat(int _x, int _y, int length, SDL_Renderer* renderer);
 
     void render(SDL_Renderer* renderer);
 };
@@ -95,30 +111,29 @@ public:
     bool fall;
 
     Player();
-    Player(int _x, int _y, SDL_Renderer* renderer);
+    Player(int _x, int _y, int _score, SDL_Renderer* renderer);
 
     void render(SDL_Renderer* renderer);
 
     void turn(direct dir, int initSpeed);
-    bool handle(vector<basicPlat>& plats, goalPlat& gplat, int& level);
+    bool handle(vector<basicPlat>& plats, destinyPlat& gplat, int& level);
     void keyboardEvent(SDL_Event e);
 
     void prepare();
 
-    bool death(vector<deadPlat>& dPlats);
+    bool death(vector<deadPlat>& dPlats, vector<goalPlat>& gPlats);
 
     bool meetPlat(basicPlat &plat);
 };
 
 void prepareNewLevel(int level, SDL_Renderer* renderer, SDL_Texture* &background);
 
-void initGame(Player& player, vector<basicPlat>& plats, vector<deadPlat>& dPlats, goalPlat& gplat, int level, SDL_Renderer* renderer);
+void initGame(Player& player, vector<basicPlat>& plats, vector<deadPlat>& dPlats, vector<goalPlat>& gPlats, destinyPlat& gplat, int level, SDL_Renderer* renderer);
 
-void present(SDL_Renderer* renderer, SDL_Texture* background, Player &box, vector<basicPlat> &plats, vector<deadPlat>& dPlats, goalPlat& gplat);
+void present(SDL_Renderer* renderer, SDL_Texture* background, Player &box, vector<basicPlat> &plats, vector<deadPlat>& dPlats, vector<goalPlat>& gPlats, destinyPlat& gplat);
 
 bool keyboardEvent(Player& player);
 
 void endGame(game Game, SDL_Renderer* renderer);
 
 #endif // MAIN_GAME
-

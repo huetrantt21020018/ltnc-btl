@@ -39,6 +39,9 @@
 		<Unit filename="SDL2_ttf.dll" />
 		<Unit filename="SDL_utils.cpp" />
 		<Unit filename="SDL_utils.h" />
+		<Unit filename="background1.png" />
+		<Unit filename="background2.png" />
+		<Unit filename="background3.png" />
 		<Unit filename="common.h" />
 		<Unit filename="level1.txt" />
 		<Unit filename="level2.txt" />
@@ -57,6 +60,12 @@
 		<Unit filename="penguinNomal.png" />
 		<Unit filename="penguinRight.png" />
 		<Unit filename="readme.txt" />
+		<Unit filename="signFail.png" />
+		<Unit filename="signLevel1.png" />
+		<Unit filename="signLevel2.png" />
+		<Unit filename="signLevel3.png" />
+		<Unit filename="signStart.png" />
+		<Unit filename="signWin.png" />
 		<Unit filename="text_object.cpp" />
 		<Unit filename="text_object.h" />
 		<Unit filename="zlib1.dll" />
