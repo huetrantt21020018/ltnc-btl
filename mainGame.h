@@ -2,8 +2,10 @@
 #define MAIN_GAME__H_
 
 #include "common.h"
+#include "SDL_text.h"
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_ttf.h>
 #include <vector>
 #include <string>
 #include <fstream>
@@ -129,6 +131,8 @@ public:
 void prepareNewLevel(int level, SDL_Renderer* renderer, SDL_Texture* &background);
 
 void initGame(Player& player, vector<basicPlat>& plats, vector<deadPlat>& dPlats, vector<goalPlat>& gPlats, destinyPlat& gplat, int level, SDL_Renderer* renderer);
+
+void presentScore(SDL_Renderer* renderer, TTF_Font* font, LTexture textTexture, int score);
 
 void present(SDL_Renderer* renderer, SDL_Texture* background, Player &box, vector<basicPlat> &plats, vector<deadPlat>& dPlats, vector<goalPlat>& gPlats, destinyPlat& gplat);
 

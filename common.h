@@ -8,6 +8,7 @@ using namespace std;
 
 const int SCREEN_WIDTH = 500;
 const int SCREEN_HEIGHT = 700;
+const int sizeText = 18;
 
 const string WINDOW_TITLE = "LTNC-BTL";
 

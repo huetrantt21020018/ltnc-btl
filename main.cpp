@@ -6,8 +6,8 @@
 
 #include "common.h"
 #include "SDL_utils.h"
+#include "SDL_text.h"
 #include "mainGame.h"
-#include "text_object.h"
 
 using namespace std;
 
@@ -17,8 +17,10 @@ int main(int argc, char* argv[]) {
 
     SDL_Window* window;
     SDL_Renderer* renderer;
-
     initSDL(window, renderer, SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE);
+    TTF_Font* font = TTF_OpenFont( "fontText/Aller_lt.ttf", sizeBox );
+    LTexture textTexture;
+
 
     // init game
 
@@ -31,7 +33,7 @@ int main(int argc, char* argv[]) {
     int level = 1;
     initGame(player, plats, dPlats, gPlats, dplat, level, renderer);
 
-    SDL_Texture* background = loadTexture("background1.png", renderer);
+    SDL_Texture* background = loadTexture("picture/background/background1.png", renderer);
 
     present(renderer, background, player, plats, dPlats, gPlats, dplat);
     endGame(START, renderer);
@@ -42,6 +44,7 @@ int main(int argc, char* argv[]) {
 
     while(!player.death(dPlats, gPlats)) {
         present(renderer, background, player, plats, dPlats, gPlats, dplat);
+        presentScore(renderer, font, textTexture, player.score);
         player.prepare();
         if(keyboardEvent(player)) break;
         if(player.handle(plats, dplat, level) && level <= 3)
@@ -59,6 +62,7 @@ int main(int argc, char* argv[]) {
 
     if(player.death(dPlats, gPlats)) endGame(LOSE, renderer);
     else endGame(WIN, renderer);
+    presentScore(renderer, font, textTexture, player.score);
 
     waitUntilKeyPressed();
     quitSDL(window, renderer);

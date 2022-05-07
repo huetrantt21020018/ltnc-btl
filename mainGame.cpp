@@ -7,6 +7,7 @@
 #include "common.h"
 #include "mainGame.h"
 #include "SDL_utils.h"
+#include "SDL_text.h"
 
 using namespace std;
 
@@ -92,11 +93,11 @@ direct Box::vertical(Box o)
 Player::Player() {}
 Player::Player(int _x, int _y, int _score, SDL_Renderer* renderer): box(_x, _y, 3 * sizeBox / 2, 3 * sizeBox / 2) {
     score = _score;
-    penguinNomal = loadTexture("penguinNomal.png", renderer);
-    penguinJump = loadTexture("penguinJump.png", renderer);
-    penguinFall = loadTexture("penguinFall.png", renderer);
- //   penguinLeft = loadTexture("penguinLeft.png", renderer);
- //   penguinRight = loadTexture("penguinRight.png", renderer);
+    penguinNomal = loadTexture("picture/penguin/penguinNomal.png", renderer);
+    penguinJump = loadTexture("picture/penguin/penguinJump.png", renderer);
+    penguinFall = loadTexture("picture/penguin/penguinFall.png", renderer);
+ //   penguinLeft = loadTexture("picture/penguin/penguinLeft.png", renderer);
+ //   penguinRight = loadTexture("picture/penguin/penguinRight.png", renderer);
 }
 
 void Player::render(SDL_Renderer* renderer)
@@ -223,7 +224,6 @@ bool Player::death(vector<deadPlat>& dPlats, vector<goalPlat>& gPlats)
     for(goalPlat &plat : gPlats) if(plat.exist && box.overlap(plat.box))
     {
         score++;
-        cout << score << endl;
         plat.exist = false;
     }
     return 0;
@@ -257,7 +257,7 @@ void basicPlat::move()
 goalPlat::goalPlat() {}
 goalPlat::goalPlat(int _x, int _y, SDL_Renderer* renderer) : box(_x, _y, sizeBox, sizeBox)
 {
-    glPlat = loadTexture("coin.jpg", renderer);
+    glPlat = loadTexture("picture/icon/coin.jpg", renderer);
 }
 
 void goalPlat::render(SDL_Renderer* renderer)
@@ -280,7 +280,7 @@ void goalPlat::render(SDL_Renderer* renderer)
 destinyPlat::destinyPlat() {}
 destinyPlat::destinyPlat(int _x, int _y, SDL_Renderer* renderer) : box(_x, _y, sizeBox, sizeBox)
 {
-    desPlat = loadTexture("tornado.jpg", renderer);
+    desPlat = loadTexture("picture/icon/tornado.jpg", renderer);
 }
 
 void destinyPlat::render(SDL_Renderer* renderer)
@@ -304,7 +304,7 @@ void destinyPlat::render(SDL_Renderer* renderer)
 deadPlat::deadPlat() {}
 deadPlat::deadPlat(int _x, int _y, int length, SDL_Renderer* renderer) : box(_x, _y, length, sizeBox)
 {
-    DeadPlat = loadTexture("deadPlat.jpg", renderer);
+    DeadPlat = loadTexture("picture/icon/deadPlat.jpg", renderer);
 }
 
 void deadPlat::render(SDL_Renderer* renderer)
@@ -326,14 +326,14 @@ void deadPlat::render(SDL_Renderer* renderer)
 
 void prepareNewLevel(int level, SDL_Renderer* renderer, SDL_Texture* &background)
 {
-    string s1 = "background";
+    string s1 = "picture/background/background";
     string s2 = to_string(level);
     string s3 = ".png";
     string fileName = s1 + s2 + s3;
 
     background = loadTexture(fileName, renderer);
 
-    s1 = "signLevel";
+    s1 = "picture/sign/signLevel";
     fileName = s1 + s2 + s3;
     SDL_Texture* sign = loadTexture(fileName, renderer);
 
@@ -353,7 +353,7 @@ void initGame(Player& player, vector<basicPlat>& plats, vector<deadPlat>& dPlats
 
     player = Player((SCREEN_WIDTH + 5*sizeBox)/2, initialHeight, player.score, renderer);
 
-    string s1 = "level";
+    string s1 = "map/level";
     string s2 = to_string(level);
     string s3 = ".txt";
 
@@ -399,6 +399,25 @@ void initGame(Player& player, vector<basicPlat>& plats, vector<deadPlat>& dPlats
     dplat = destinyPlat(x, y, renderer);
 }
 
+void presentScore(SDL_Renderer* renderer, TTF_Font* font, LTexture textTexture, int score)
+{
+    SDL_SetRenderDrawColor( renderer, 0xFF, 0xFF, 0xFF, 0xFF );
+
+    SDL_Color textColor = { 0, 0, 0 };
+    string s1 = "SCORE: ";
+    string s2 = to_string(score);
+    string text = s1 + s2;
+    if( !textTexture.loadFromRenderedText( text, textColor, renderer, font ) )
+    {
+        printf( "Failed to render text texture!\n" );
+        return;
+    }
+
+    textTexture.render(sizeBox, sizeBox, renderer);
+    SDL_RenderPresent(renderer);
+
+}
+
 void present(SDL_Renderer* renderer, SDL_Texture* background, Player &player, vector<basicPlat>& plats, vector<deadPlat>& dPlats, vector<goalPlat>& gPlats, destinyPlat& dplat)
 {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
@@ -413,7 +432,7 @@ void present(SDL_Renderer* renderer, SDL_Texture* background, Player &player, ve
 
     player.render(renderer);
 
-    SDL_RenderPresent(renderer);
+    //SDL_RenderPresent(renderer);
 }
 
 bool keyboardEvent(Player& player)
@@ -428,9 +447,9 @@ bool keyboardEvent(Player& player)
 
 void endGame(game Game, SDL_Renderer* renderer)
 {
-    SDL_Texture* sign = loadTexture("signStart.png", renderer);
-    if(Game == LOSE) sign =  loadTexture("signFail.png", renderer);
-    if(Game == WIN) sign = loadTexture("signWin.png", renderer);
+    SDL_Texture* sign = loadTexture("picture/sign/signStart.png", renderer);
+    if(Game == LOSE) sign =  loadTexture("picture/sign/signFail.png", renderer);
+    if(Game == WIN) sign = loadTexture("picture/sign/signWin.png", renderer);
 
     SDL_Rect signRect;
     SDL_QueryTexture(sign, NULL, NULL, &signRect.w, &signRect.h);

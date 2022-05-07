@@ -31,18 +31,20 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="LICENSE.freetype.txt" />
-		<Unit filename="LICENSE.harfbuzz.txt" />
-		<Unit filename="LICENSE.zlib.txt" />
 		<Unit filename="SDL2.dll" />
 		<Unit filename="SDL2_image.dll" />
 		<Unit filename="SDL2_ttf.dll" />
+		<Unit filename="SDL_text.cpp" />
+		<Unit filename="SDL_text.h" />
 		<Unit filename="SDL_utils.cpp" />
 		<Unit filename="SDL_utils.h" />
 		<Unit filename="background1.png" />
 		<Unit filename="background2.png" />
 		<Unit filename="background3.png" />
+		<Unit filename="coin.jpg" />
 		<Unit filename="common.h" />
+		<Unit filename="deadPlat.jpg" />
+		<Unit filename="fontText/Aller_It.ttf" />
 		<Unit filename="level1.txt" />
 		<Unit filename="level2.txt" />
 		<Unit filename="level3.txt" />
@@ -66,8 +68,7 @@
 		<Unit filename="signLevel3.png" />
 		<Unit filename="signStart.png" />
 		<Unit filename="signWin.png" />
-		<Unit filename="text_object.cpp" />
-		<Unit filename="text_object.h" />
+		<Unit filename="tornado.jpg" />
 		<Unit filename="zlib1.dll" />
 		<Extensions>
 			<code_completion />

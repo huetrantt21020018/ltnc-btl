@@ -1,6 +1,6 @@
 #include "SDL_utils.h"
 #include <iostream>
-#include <SDL_image.h>
+
 
 void logSDLError(std::ostream& os, const std::string &msg, bool fatal)
 {
@@ -30,6 +30,21 @@ void initSDL(SDL_Window* &window, SDL_Renderer* &renderer, int SCREEN_WIDTH, int
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
     SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+     //Initialize PNG loading
+    int imgFlags = IMG_INIT_PNG;
+    if( !( IMG_Init( imgFlags ) & imgFlags ) )
+    {
+        printf( "SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError() );
+        return;
+    }
+
+    //Initialize SDL_ttf
+    if( TTF_Init() == -1 )
+    {
+        printf( "SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError() );
+        return;
+     }
 }
 
 void quitSDL(SDL_Window* window, SDL_Renderer* renderer)
