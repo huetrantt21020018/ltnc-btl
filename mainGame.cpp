@@ -1,6 +1,5 @@
 #include <iostream>
 #include <stdlib.h>
-#include <time.h>
 #include <fstream>
 #include <string>
 
@@ -465,4 +464,43 @@ void endGame(game Game, SDL_Renderer* renderer)
             break;
         SDL_Delay(100);
     } while(true);
+}
+
+void updRanking(SDL_Renderer* renderer, TTF_Font* font, LTexture textTexture, int score)
+{
+    // upd file ranking
+
+    ifstream inFile("ranking.txt");
+
+    vector<int> scores;
+    scores.push_back(score);
+
+    int oScore;
+    while(inFile >> oScore)
+        scores.push_back(oScore);
+
+    sort(scores.begin(), scores.end(), greater<int> ());
+    if(scores.size() > 5) scores.pop_back();
+
+    ofstream outFile("ranking.txt");
+    for(int x: scores) outFile << x << endl;
+
+    // in ra man hinh
+    SDL_SetRenderDrawColor( renderer, 0xFF, 0xFF, 0xFF, 0xFF );
+    SDL_Color textColor = { 255, 255, 255 };
+
+    string s1 = "HIGHEST SCORE: ";
+    string s2 = to_string(*scores.begin());
+    string text = s1 + s2;
+    if(score == *scores.begin() && score > *next(scores.begin()))
+        text = "NEW HIGHEST SCORE!";
+
+    if( !textTexture.loadFromRenderedText( text, textColor, renderer, font ) )
+    {
+        printf( "Failed to render text texture!\n" );
+        return;
+    }
+    textTexture.render(205, 575, renderer);
+    SDL_RenderPresent(renderer);
+
 }

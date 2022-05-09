@@ -3,12 +3,15 @@
 
 #include "common.h"
 #include "SDL_text.h"
+
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
+
 #include <vector>
 #include <string>
 #include <fstream>
+#include <algorithm>
 
 int rnd(int a, int b);
 
@@ -139,5 +142,7 @@ void present(SDL_Renderer* renderer, SDL_Texture* background, Player &box, vecto
 bool keyboardEvent(Player& player);
 
 void endGame(game Game, SDL_Renderer* renderer);
+
+void updRanking(SDL_Renderer* renderer, TTF_Font* font, LTexture textTexture, int score);
 
 #endif // MAIN_GAME

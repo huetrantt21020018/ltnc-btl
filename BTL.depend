@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1651911450 source:c:\users\sinhvienuet\ltnc\btl\main.cpp
+1652082198 source:c:\users\sinhvienuet\ltnc\btl\main.cpp
 	<SDL.h>
 	<SDL_ttf.h>
 	<iostream>
@@ -24,7 +24,7 @@
 	<string>
 	"common.h"
 
-1651911073 c:\users\sinhvienuet\ltnc\btl\maingame.h
+1652081991 c:\users\sinhvienuet\ltnc\btl\maingame.h
 	"common.h"
 	"SDL_text.h"
 	<SDL.h>
@@ -33,11 +33,11 @@
 	<vector>
 	<string>
 	<fstream>
+	<algorithm>
 
-1651911421 source:c:\users\sinhvienuet\ltnc\btl\maingame.cpp
+1652082948 source:c:\users\sinhvienuet\ltnc\btl\maingame.cpp
 	<iostream>
 	<stdlib.h>
-	<time.h>
 	<fstream>
 	<string>
 	"common.h"

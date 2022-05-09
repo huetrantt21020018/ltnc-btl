@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
     SDL_Window* window;
     SDL_Renderer* renderer;
     initSDL(window, renderer, SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE);
-    TTF_Font* font = TTF_OpenFont( "fontText/Aller_lt.ttf", sizeBox );
+    TTF_Font* font = TTF_OpenFont( "fontText/Aller_lt.ttf", sizeBox);
     LTexture textTexture;
 
 
@@ -53,15 +53,20 @@ int main(int argc, char* argv[]) {
             present(renderer, background, player, plats, dPlats, gPlats, dplat);
             prepareNewLevel(level, renderer, background);
         }
-        if(level > 3) break;
+        if(level > 1) break;
         SDL_Delay(TIME_DELAY);
     }
 
     present(renderer, background, player, plats, dPlats, gPlats, dplat);
+    presentScore(renderer, font, textTexture, player.score);
     SDL_Delay(1000);
 
     if(player.death(dPlats, gPlats)) endGame(LOSE, renderer);
-    else endGame(WIN, renderer);
+    else
+    {
+        endGame(WIN, renderer);
+        updRanking(renderer, font, textTexture, player.score);
+    }
     presentScore(renderer, font, textTexture, player.score);
 
     waitUntilKeyPressed();
