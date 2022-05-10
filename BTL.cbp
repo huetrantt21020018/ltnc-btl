@@ -33,6 +33,7 @@
 		</Compiler>
 		<Unit filename="SDL2.dll" />
 		<Unit filename="SDL2_image.dll" />
+		<Unit filename="SDL2_mixer.dll" />
 		<Unit filename="SDL2_ttf.dll" />
 		<Unit filename="SDL_text.cpp" />
 		<Unit filename="SDL_text.h" />
@@ -40,9 +41,17 @@
 		<Unit filename="SDL_utils.h" />
 		<Unit filename="common.h" />
 		<Unit filename="fontText/Aller_It.ttf" />
+		<Unit filename="libFLAC-8.dll" />
 		<Unit filename="libjpeg-9.dll" />
+		<Unit filename="libmodplug-1.dll" />
+		<Unit filename="libmpg123-0.dll" />
+		<Unit filename="libogg-0.dll" />
+		<Unit filename="libopus-0.dll" />
+		<Unit filename="libopusfile-0.dll" />
 		<Unit filename="libpng16-16.dll" />
 		<Unit filename="libtiff-5.dll" />
+		<Unit filename="libvorbis-0.dll" />
+		<Unit filename="libvorbisfile-3.dll" />
 		<Unit filename="libwebp-7.dll" />
 		<Unit filename="main.cpp" />
 		<Unit filename="mainGame.cpp" />
@@ -54,7 +63,7 @@
 		<Unit filename="picture/background/background2.png" />
 		<Unit filename="picture/background/background3.png" />
 		<Unit filename="picture/icon/coin.jpg" />
-		<Unit filename="picture/icon/deadPlat.jpg" />
+		<Unit filename="picture/icon/deadPlat.png" />
 		<Unit filename="picture/icon/tornado.jpg" />
 		<Unit filename="picture/penguin/penguinFall.png" />
 		<Unit filename="picture/penguin/penguinJump.png" />
@@ -67,6 +76,12 @@
 		<Unit filename="picture/sign/signWin.png" />
 		<Unit filename="ranking.txt" />
 		<Unit filename="readme.txt" />
+		<Unit filename="sound/dead.wav" />
+		<Unit filename="sound/goal.wav" />
+		<Unit filename="sound/jump.wav" />
+		<Unit filename="sound/nextLevel.wav" />
+		<Unit filename="sound/start.wav" />
+		<Unit filename="sound/win.wav" />
 		<Unit filename="zlib1.dll" />
 		<Extensions>
 			<code_completion />

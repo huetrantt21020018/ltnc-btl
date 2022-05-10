@@ -15,6 +15,7 @@ int rnd(int a, int b) { return (rand() % (b-a+1) + a); }
 // box
 
 Box::Box() {}
+Box::~Box() {}
 Box::Box(int _x, int _y, int _w, int _h):
     x(_x), y(_y), width(_w), height(_h) {}
 
@@ -90,6 +91,17 @@ direct Box::vertical(Box o)
 // player
 
 Player::Player() {}
+
+Player::~Player()
+{
+    /**
+    SDL_DestroyTexture(penguinNomal);
+    SDL_DestroyTexture(penguinJump);
+    SDL_DestroyTexture(penguinFall);
+*/
+}
+
+
 Player::Player(int _x, int _y, int _score, SDL_Renderer* renderer): box(_x, _y, 3 * sizeBox / 2, 3 * sizeBox / 2) {
     score = _score;
     penguinNomal = loadTexture("picture/penguin/penguinNomal.png", renderer);
@@ -117,11 +129,12 @@ void Player::render(SDL_Renderer* renderer)
     SDL_RenderCopy(renderer, penguin, NULL, &penRect);
 }
 
-void Player::turn(direct dir, int initSpeed)
+void Player::turn(direct dir, int initSpeed, Mix_Chunk *mState)
 {
     if(dir == UP && (box.state[UP] || box.state[DOWN])) return;
     box.state[dir] = true;
     box.speed[dir] = initSpeed;
+    if(mState != NULL) Mix_PlayChannel( -1, mState, 0 );
 }
 
 void Player::prepare()
@@ -134,14 +147,14 @@ void Player::prepare()
         if(box.speed[UP] < 0)
         {
             box.state[UP] = false;
-            turn(DOWN, 0);
+            turn(DOWN, 0, NULL);
         }
     }
     if(box.state[DOWN])
     {
         box.speed[DOWN]++;
     }
-    else if(!box.state[UP] && fall) turn(DOWN, 0);
+    else if(!box.state[UP] && fall) turn(DOWN, 0, NULL);
 }
 
 bool Player::handle(vector<basicPlat>& plats, destinyPlat& dplat, int& level)
@@ -190,7 +203,7 @@ bool Player::handle(vector<basicPlat>& plats, destinyPlat& dplat, int& level)
             {
                 box.y = plat.box.y + box.height;
                 box.state[UP] = false;
-                turn(DOWN, 0);
+                turn(DOWN, 0, NULL);
             }
         }
     }
@@ -203,26 +216,35 @@ bool Player::handle(vector<basicPlat>& plats, destinyPlat& dplat, int& level)
     return 0;
 }
 
-void Player::keyboardEvent(SDL_Event e)
+void Player::keyboardEvent(SDL_Event e, Mix_Chunk *mJump)
 {
     // keyboard event
     switch (e.key.keysym.sym)
     {
-        case SDLK_UP: turn(UP, MAXSPEED); break;
+        case SDLK_UP: turn(UP, MAXSPEED, mJump); break;
 //        case SDLK_DOWN: moveDown(); break;
-        case SDLK_RIGHT: turn(RIGHT, sizeBox); break;
-        case SDLK_LEFT: turn(LEFT, sizeBox); break;
+        case SDLK_RIGHT: turn(RIGHT, sizeBox, NULL); break;
+        case SDLK_LEFT: turn(LEFT, sizeBox, NULL); break;
         default: break;
     }
 }
 
-bool Player::death(vector<deadPlat>& dPlats, vector<goalPlat>& gPlats)
+bool Player::death(vector<deadPlat>& dPlats, vector<goalPlat>& gPlats, Mix_Chunk *mDead, Mix_Chunk *mGoal)
 {
-    if (box.fallOut()) return 1;
-    for(deadPlat plat : dPlats) if(box.overlap(plat.box)) return 1;
+    if (box.fallOut())
+    {
+        if(mDead != NULL) Mix_PlayChannel( -1, mDead, 0 );
+        return 1;
+    }
+    for(deadPlat plat : dPlats) if(box.overlap(plat.box))
+    {
+        if(mDead != NULL) Mix_PlayChannel( -1, mDead, 0 );
+        return 1;
+    }
     for(goalPlat &plat : gPlats) if(plat.exist && box.overlap(plat.box))
     {
         score++;
+        if(mDead != NULL) Mix_PlayChannel( -1, mGoal, 0 );
         plat.exist = false;
     }
     return 0;
@@ -231,6 +253,9 @@ bool Player::death(vector<deadPlat>& dPlats, vector<goalPlat>& gPlats)
 // basicPlat
 
 basicPlat::basicPlat() {}
+
+basicPlat::~basicPlat() {}
+
 basicPlat::basicPlat(int _x, int _y, int length, direct _dir):
     box(_x, _y, length, sizeBox) {box.state[_dir] = 1; dir = _dir;}
 
@@ -254,6 +279,12 @@ void basicPlat::move()
 // goal Plat
 
 goalPlat::goalPlat() {}
+
+goalPlat::~goalPlat()
+{
+  //  SDL_DestroyTexture(glPlat);
+}
+
 goalPlat::goalPlat(int _x, int _y, SDL_Renderer* renderer) : box(_x, _y, sizeBox, sizeBox)
 {
     glPlat = loadTexture("picture/icon/coin.jpg", renderer);
@@ -277,6 +308,12 @@ void goalPlat::render(SDL_Renderer* renderer)
 // destiny Plat
 
 destinyPlat::destinyPlat() {}
+
+destinyPlat::~destinyPlat()
+{
+   /// SDL_DestroyTexture(desPlat);
+}
+
 destinyPlat::destinyPlat(int _x, int _y, SDL_Renderer* renderer) : box(_x, _y, sizeBox, sizeBox)
 {
     desPlat = loadTexture("picture/icon/tornado.jpg", renderer);
@@ -301,9 +338,15 @@ void destinyPlat::render(SDL_Renderer* renderer)
 // dead Plat
 
 deadPlat::deadPlat() {}
+
+deadPlat::~deadPlat()
+{
+    ///SDL_DestroyTexture(DeadPlat);
+}
+
 deadPlat::deadPlat(int _x, int _y, int length, SDL_Renderer* renderer) : box(_x, _y, length, sizeBox)
 {
-    DeadPlat = loadTexture("picture/icon/deadPlat.jpg", renderer);
+    DeadPlat = loadTexture("picture/icon/deadPlat.png", renderer);
 }
 
 void deadPlat::render(SDL_Renderer* renderer)
@@ -346,11 +389,12 @@ void prepareNewLevel(int level, SDL_Renderer* renderer, SDL_Texture* &background
     SDL_Delay(1000);
 }
 
-void initGame(Player& player, vector<basicPlat>& plats, vector<deadPlat>& dPlats, vector<goalPlat>& gPlats, destinyPlat& dplat, int level, SDL_Renderer* renderer)
+void initGame(Player& player, vector<basicPlat>& plats, vector<deadPlat>& dPlats, vector<goalPlat>& gPlats, destinyPlat& dplat, int level, SDL_Renderer* renderer, Mix_Chunk *mStart)
 {
     //srand(time(nullptr));
 
     player = Player((SCREEN_WIDTH + 5*sizeBox)/2, initialHeight, player.score, renderer);
+    free(plats, gPlats, dPlats, dplat);
 
     string s1 = "map/level";
     string s2 = to_string(level);
@@ -362,7 +406,6 @@ void initGame(Player& player, vector<basicPlat>& plats, vector<deadPlat>& dPlats
     int n;
     inFile >> n;
 
-    plats.clear();
     for(int i = 0; i < n; ++i)
     {
         int x, y, len, d;
@@ -373,7 +416,6 @@ void initGame(Player& player, vector<basicPlat>& plats, vector<deadPlat>& dPlats
         plats.push_back(plat);
     }
 
-    dPlats.clear();
     inFile >> n;
     for(int i = 0; i < n; ++i)
     {
@@ -383,7 +425,6 @@ void initGame(Player& player, vector<basicPlat>& plats, vector<deadPlat>& dPlats
         dPlats.push_back(plat);
     }
 
-    gPlats.clear();
     inFile >> n;
     for(int i = 0; i < n; ++i)
     {
@@ -396,6 +437,8 @@ void initGame(Player& player, vector<basicPlat>& plats, vector<deadPlat>& dPlats
     int x, y, len;
     inFile >> x >> y >> len;
     dplat = destinyPlat(x, y, renderer);
+
+    Mix_PlayChannel( -1, mStart, 0 );
 }
 
 void presentScore(SDL_Renderer* renderer, TTF_Font* font, LTexture textTexture, int score)
@@ -434,17 +477,17 @@ void present(SDL_Renderer* renderer, SDL_Texture* background, Player &player, ve
     //SDL_RenderPresent(renderer);
 }
 
-bool keyboardEvent(Player& player)
+bool keyboardEvent(Player& player, Mix_Chunk* mState)
 {
     SDL_Event e;
     if(SDL_PollEvent(&e) == 0) return 0;
     if(e.type == SDL_QUIT) return 1;
     if(e.type == SDL_KEYDOWN)
-        player.keyboardEvent(e);
+        player.keyboardEvent(e, mState);
     return 0;
 }
 
-void endGame(game Game, SDL_Renderer* renderer)
+void endGame(game Game, SDL_Renderer* renderer, Mix_Chunk *mState)
 {
     SDL_Texture* sign = loadTexture("picture/sign/signStart.png", renderer);
     if(Game == LOSE) sign =  loadTexture("picture/sign/signFail.png", renderer);
@@ -454,6 +497,8 @@ void endGame(game Game, SDL_Renderer* renderer)
     SDL_QueryTexture(sign, NULL, NULL, &signRect.w, &signRect.h);
     signRect.x = 75;
     signRect.y = SCREEN_HEIGHT - signRect.h + 20;
+
+    if(mState != NULL) Mix_PlayChannel( -1, mState, 0 );
 
     SDL_RenderCopy(renderer, sign, NULL, &signRect);
     SDL_RenderPresent(renderer);
@@ -503,4 +548,35 @@ void updRanking(SDL_Renderer* renderer, TTF_Font* font, LTexture textTexture, in
     textTexture.render(205, 575, renderer);
     SDL_RenderPresent(renderer);
 
+}
+
+void free(vector<basicPlat> &plats, vector<goalPlat> &gPlats, vector<deadPlat> &dPlats, destinyPlat &dplat)
+{
+    plats.clear();
+
+    for(goalPlat &plat: gPlats) SDL_DestroyTexture(plat.glPlat);
+    gPlats.clear();
+
+    for(deadPlat &plat: dPlats) SDL_DestroyTexture(plat.DeadPlat);
+    dPlats.clear();
+
+    SDL_DestroyTexture(dplat.desPlat);
+}
+
+void releaseMemory(Player &player, vector<basicPlat> &plats, vector<goalPlat> &gPlats, vector<deadPlat> &dPlats, destinyPlat &dplat, SDL_Texture* &background,
+                  Mix_Chunk* &mDead, Mix_Chunk* &mGoal, Mix_Chunk* &mJump, Mix_Chunk* &mNext, Mix_Chunk* &mStart, Mix_Chunk* &mWin)
+{
+    SDL_DestroyTexture(player.penguinNomal);
+    SDL_DestroyTexture(player.penguinNomal);
+    SDL_DestroyTexture(player.penguinNomal);
+
+    free(plats, gPlats, dPlats, dplat);
+    SDL_DestroyTexture(background);
+
+    Mix_FreeChunk(mDead);
+    Mix_FreeChunk(mGoal);
+    Mix_FreeChunk(mJump);
+    Mix_FreeChunk(mNext);
+    Mix_FreeChunk(mStart);
+    Mix_FreeChunk(mWin);
 }
