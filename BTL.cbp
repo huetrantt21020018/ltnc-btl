@@ -74,8 +74,13 @@
 		<Unit filename="picture/sign/signLevel3.png" />
 		<Unit filename="picture/sign/signStart.png" />
 		<Unit filename="picture/sign/signWin.png" />
+		<Unit filename="plat.cpp" />
+		<Unit filename="plat.h" />
+		<Unit filename="player.cpp" />
+		<Unit filename="player.h" />
 		<Unit filename="ranking.txt" />
 		<Unit filename="readme.txt" />
+		<Unit filename="sound/bgm.wav" />
 		<Unit filename="sound/dead.wav" />
 		<Unit filename="sound/goal.wav" />
 		<Unit filename="sound/jump.wav" />
