@@ -49,6 +49,7 @@ void Player::turn(direct dir, int initSpeed, Mix_Chunk *mState) {
 }
 
 void Player::prepare() {
+    // change direction and speed
     box.state[LEFT] = box.state[RIGHT] = false;
 
     if(box.state[UP]) {
@@ -73,6 +74,7 @@ bool Player::handle(vector<basicPlat>& plats, destinyPlat& dplat, int& level) {
 
     int n = plats.size();
 
+    // move all plat
     for(int i = 0; i < n; i++) {
         plats[i].move();
         if(i == locate) {
@@ -81,10 +83,12 @@ bool Player::handle(vector<basicPlat>& plats, destinyPlat& dplat, int& level) {
             box.y -= tmp.y - plats[i].box.y;
         }
     }
+
     for(int i = 0; i < n; i++) {
         basicPlat plat = plats[i];
         if(box.overlap(plat.box)) fall = 0;
 
+        // hit horizontally
         if(pre.horizontal(plat.box.premove()) == LEFT && box.horizontal(plat.box) != LEFT && box.state[RIGHT]) {
             box.x = min(box.x, plat.box.x - box.width);
         }
@@ -92,12 +96,15 @@ bool Player::handle(vector<basicPlat>& plats, destinyPlat& dplat, int& level) {
             box.x = max(box.x, plat.box.x + plat.box.width);
         }
 
+        // hit vertically
         if(pre.vertical(plat.box.premove()) == UP && box.vertical(plat.box) != UP && box.state[DOWN] && box.overlap(plat.box)) {
+            // falling down hit the plat
             locate = i;
             box.y = plat.box.y - box.height;
             box.state[UP] = box.state[DOWN] = false;
         }
         else if(pre.vertical(plat.box.premove()) == DOWN && box.vertical(plat.box) != DOWN && box.state[UP] && box.overlap(plat.box)) {
+            // Can't go up because of hitting plat
             if(box.y < plat.box.y + box.height) {
                 box.y = plat.box.y + box.height;
                 box.state[UP] = false;
@@ -106,6 +113,7 @@ bool Player::handle(vector<basicPlat>& plats, destinyPlat& dplat, int& level) {
         }
     }
 
+    // pass this level
     if(box.overlap(dplat.box)) {
         level++;
         return 1;
@@ -126,14 +134,17 @@ void Player::keyboardEvent(SDL_Event e, Mix_Chunk *mJump) {
 
 bool Player::death(vector<deadPlat>& dPlats, vector<goalPlat>& gPlats, Mix_Chunk *mDead, Mix_Chunk *mGoal) {
     if (box.fallOut()) {
+            // out of map
         if(mDead != NULL) Mix_PlayChannel( -1, mDead, 0 );
         return 1;
     }
     for(deadPlat plat : dPlats) if(box.overlap(plat.box)) {
+        // hit the dead plat
         if(mDead != NULL) Mix_PlayChannel( -1, mDead, 0 );
         return 1;
     }
     for(goalPlat &plat : gPlats) if(plat.exist && box.overlap(plat.box)) {
+        // collect coin
         score++;
         if(mDead != NULL) Mix_PlayChannel( -1, mGoal, 0 );
         plat.exist = false;

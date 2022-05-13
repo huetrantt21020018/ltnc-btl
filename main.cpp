@@ -49,6 +49,7 @@ int main(int argc, char* argv[]) {
 
     SDL_Texture* background = loadTexture("picture/background/background1.png", renderer);
 
+    // present screen
     present(renderer, background, player, plats, dPlats, gPlats, dplat);
     endGame(START, renderer, NULL);
     present(renderer, background, player, plats, dPlats, gPlats, dplat);
@@ -63,6 +64,7 @@ int main(int argc, char* argv[]) {
 
         if(keyboardEvent(player, mJump)) break;
         if(player.handle(plats, dplat, level) && level <= 3) {
+                // next level
             initGame(player, plats, dPlats, gPlats, dplat, level, renderer, mNext);
             present(renderer, background, player, plats, dPlats, gPlats, dplat);
             prepareNewLevel(level, renderer, background);
@@ -71,6 +73,8 @@ int main(int argc, char* argv[]) {
 
         SDL_Delay(TIME_DELAY);
     }
+
+    // end game
 
     present(renderer, background, player, plats, dPlats, gPlats, dplat);
     presentScore(renderer, font, textTexture, player.score);
@@ -84,6 +88,8 @@ int main(int argc, char* argv[]) {
     presentScore(renderer, font, textTexture, player.score);
 
     waitUntilKeyPressed();
+
+    // release memory
 
     releaseMemory(player, plats, gPlats, dPlats, dplat, background, mDead, mGoal, mJump, mNext, mStart, mWin, mBeat);
 

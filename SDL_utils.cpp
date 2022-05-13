@@ -2,8 +2,7 @@
 #include <iostream>
 
 
-void logSDLError(std::ostream& os, const std::string &msg, bool fatal)
-{
+void logSDLError(std::ostream& os, const std::string &msg, bool fatal) {
     os << msg << " Error: " << SDL_GetError() << std::endl;
     if (fatal) {
         SDL_Quit();
@@ -11,8 +10,7 @@ void logSDLError(std::ostream& os, const std::string &msg, bool fatal)
     }
 }
 
-void initSDL(SDL_Window* &window, SDL_Renderer* &renderer, int SCREEN_WIDTH, int SCREEN_HEIGHT, const string WINDOW_TITLE)
-{
+void initSDL(SDL_Window* &window, SDL_Renderer* &renderer, int SCREEN_WIDTH, int SCREEN_HEIGHT, const string WINDOW_TITLE) {
     if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_AUDIO ) < 0 ){
 		printf( "SDL could not initialize! SDL Error: %s\n", SDL_GetError() );
 	}
@@ -37,29 +35,25 @@ void initSDL(SDL_Window* &window, SDL_Renderer* &renderer, int SCREEN_WIDTH, int
 
      //Initialize PNG loading
     int imgFlags = IMG_INIT_PNG;
-    if( !( IMG_Init( imgFlags ) & imgFlags ) )
-    {
+    if( !( IMG_Init( imgFlags ) & imgFlags ) ) {
         printf( "SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError() );
         return;
     }
 
     //Initialize SDL_ttf
-    if( TTF_Init() == -1 )
-    {
+    if( TTF_Init() == -1 ) {
         printf( "SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError() );
         return;
     }
 
      //Initialize SDL_mixer
-    if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 )
-    {
+    if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 ) {
         printf( "SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError() );
         return;
     }
 }
 
-void quitSDL(SDL_Window* window, SDL_Renderer* renderer)
-{
+void quitSDL(SDL_Window* window, SDL_Renderer* renderer) {
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	Mix_Quit();
@@ -67,8 +61,7 @@ void quitSDL(SDL_Window* window, SDL_Renderer* renderer)
 	SDL_Quit();
 }
 
-void waitUntilKeyPressed()
-{
+void waitUntilKeyPressed() {
     SDL_Event e;
     while (true) {
         if (SDL_WaitEvent(&e) != 0 && (e.type == SDL_KEYDOWN || e.type == SDL_QUIT) )
@@ -77,8 +70,7 @@ void waitUntilKeyPressed()
     }
 }
 
-SDL_Texture* loadTexture( string path, SDL_Renderer* renderer )
-{
+SDL_Texture* loadTexture( string path, SDL_Renderer* renderer ) {
     SDL_Texture* newTexture = nullptr;
     SDL_Surface* loadedSurface = IMG_Load( path.c_str() );
     if ( loadedSurface == nullptr )

@@ -9,6 +9,9 @@ int rnd(int a, int b) {
 // game handling
 
 void prepareNewLevel(int level, SDL_Renderer* renderer, SDL_Texture* &background) {
+
+    // load background and sign
+
     string s1 = "picture/background/background";
     string s2 = to_string(level);
     string s3 = ".png";
@@ -43,6 +46,8 @@ void initGame(Player& player, vector<basicPlat>& plats, vector<deadPlat>& dPlats
     string fileName = s1 + s2 + s3;
     ifstream inFile(fileName);
 
+    // input basic plat
+
     int n;
     inFile >> n;
 
@@ -56,6 +61,8 @@ void initGame(Player& player, vector<basicPlat>& plats, vector<deadPlat>& dPlats
         plats.push_back(plat);
     }
 
+    // input dead plat
+
     inFile >> n;
     for(int i = 0; i < n; ++i) {
         int x, y, len;
@@ -63,6 +70,8 @@ void initGame(Player& player, vector<basicPlat>& plats, vector<deadPlat>& dPlats
         deadPlat plat(x, y, len, renderer);
         dPlats.push_back(plat);
     }
+
+    // input goal plat
 
     inFile >> n;
     for(int i = 0; i < n; ++i) {
@@ -72,9 +81,13 @@ void initGame(Player& player, vector<basicPlat>& plats, vector<deadPlat>& dPlats
         gPlats.push_back(plat);
     }
 
+    // input destiny plat
+
     int x, y, len;
     inFile >> x >> y >> len;
     dplat = destinyPlat(x, y, renderer);
+
+    // play music
 
     Mix_PlayChannel( -1, mStart, 0 );
 }
@@ -128,7 +141,7 @@ void endGame(game Game, SDL_Renderer* renderer, Mix_Chunk *mState) {
 
     SDL_Rect signRect;
     SDL_QueryTexture(sign, NULL, NULL, &signRect.w, &signRect.h);
-    signRect.x = 75;
+    signRect.x = 70;
     signRect.y = SCREEN_HEIGHT - signRect.h + 20;
 
     if(mState != NULL) Mix_PlayChannel( -1, mState, 0 );
@@ -136,6 +149,8 @@ void endGame(game Game, SDL_Renderer* renderer, Mix_Chunk *mState) {
     SDL_RenderCopy(renderer, sign, NULL, &signRect);
     SDL_RenderPresent(renderer);
 
+
+    // exit game
     SDL_Event e;
     do {
         if(SDL_WaitEvent(&e) != 0 && e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_RETURN)
@@ -145,7 +160,7 @@ void endGame(game Game, SDL_Renderer* renderer, Mix_Chunk *mState) {
 }
 
 void updRanking(SDL_Renderer* renderer, TTF_Font* font, LTexture textTexture, int score) {
-    // upd file ranking
+    // update file ranking
 
     ifstream inFile("ranking.txt");
 
@@ -162,7 +177,7 @@ void updRanking(SDL_Renderer* renderer, TTF_Font* font, LTexture textTexture, in
     ofstream outFile("ranking.txt");
     for(int x: scores) outFile << x << endl;
 
-    // in ra man hinh
+    // present screen
     SDL_SetRenderDrawColor( renderer, 0xFF, 0xFF, 0xFF, 0xFF );
     SDL_Color textColor = { 255, 255, 255 };
 
@@ -178,7 +193,6 @@ void updRanking(SDL_Renderer* renderer, TTF_Font* font, LTexture textTexture, in
     }
     textTexture.render(205, 575, renderer);
     SDL_RenderPresent(renderer);
-
 }
 
 void free(vector<basicPlat> &plats, vector<goalPlat> &gPlats, vector<deadPlat> &dPlats, destinyPlat &dplat) {
@@ -196,6 +210,7 @@ void free(vector<basicPlat> &plats, vector<goalPlat> &gPlats, vector<deadPlat> &
 
 void releaseMemory(Player &player, vector<basicPlat> &plats, vector<goalPlat> &gPlats, vector<deadPlat> &dPlats, destinyPlat &dplat, SDL_Texture* &background,
                   Mix_Chunk* &mDead, Mix_Chunk* &mGoal, Mix_Chunk* &mJump, Mix_Chunk* &mNext, Mix_Chunk* &mStart, Mix_Chunk* &mWin, Mix_Music* &mBeat) {
+
     SDL_DestroyTexture(player.penguinNomal);
     SDL_DestroyTexture(player.penguinNomal);
     SDL_DestroyTexture(player.penguinNomal);

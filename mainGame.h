@@ -21,15 +21,20 @@ void prepareNewLevel(int level, SDL_Renderer* renderer, SDL_Texture* &background
 
 void initGame(Player& player, vector<basicPlat>& plats, vector<deadPlat>& dPlats, vector<goalPlat>& gPlats, destinyPlat& gplat, int level, SDL_Renderer* renderer, Mix_Chunk *mStart);
 
+// present everything
+
 void presentScore(SDL_Renderer* renderer, TTF_Font* font, LTexture textTexture, int score);
 
 void present(SDL_Renderer* renderer, SDL_Texture* background, Player &box, vector<basicPlat> &plats, vector<deadPlat>& dPlats, vector<goalPlat>& gPlats, destinyPlat& gplat);
 
 bool keyboardEvent(Player& player, Mix_Chunk* mState);
 
+// print the status if the game is over
 void endGame(game Game, SDL_Renderer* renderer, Mix_Chunk *mState);
 
 void updRanking(SDL_Renderer* renderer, TTF_Font* font, LTexture textTexture, int score);
+
+// memory recovery
 
 void free(vector<basicPlat> &plats, vector<goalPlat> &gPlats, vector<deadPlat> &dPlats, destinyPlat &dplat);
 

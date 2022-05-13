@@ -22,7 +22,8 @@ public:
     SDL_Texture* penguinFall;
 
     Box box;
-    int locate = 0, score = 0;
+    int locate = 0; // the plat that the player standing above
+    int score = 0;
     bool fall;
 
     Player();
@@ -31,15 +32,19 @@ public:
 
     void render(SDL_Renderer* renderer);
 
+    // player control
     void turn(direct dir, int initSpeed, Mix_Chunk *mState);
-    bool handle(vector<basicPlat>& plats, destinyPlat& gplat, int& level);
     void keyboardEvent(SDL_Event e, Mix_Chunk* mJump);
 
+    // handle the situation if you touch the plat
+    bool handle(vector<basicPlat>& plats, destinyPlat& gplat, int& level);
+
+    // change direction and speed
     void prepare();
 
+    // check if the player broke the rules
     bool death(vector<deadPlat>& dPlats, vector<goalPlat>& gPlats, Mix_Chunk *mDead, Mix_Chunk *mGoal);
 
-    bool meetPlat(basicPlat &plat);
 };
 
 #endif // PLAYER

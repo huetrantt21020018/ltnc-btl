@@ -8,8 +8,7 @@
 
 using namespace std;
 
-class LTexture
-{
+class LTexture {
 	public:
 		//Initializes variables
 		LTexture();
