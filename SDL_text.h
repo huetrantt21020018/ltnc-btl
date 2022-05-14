@@ -40,6 +40,8 @@ class LTexture {
 		int getWidth();
 		int getHeight();
 
+		SDL_Rect getRect();
+
 	private:
 		//The actual hardware texture
 		SDL_Texture* mTexture;
@@ -47,6 +49,8 @@ class LTexture {
 		//Image dimensions
 		int mWidth;
 		int mHeight;
+		int X;
+		int Y;
 };
 
 #endif // SDL_text

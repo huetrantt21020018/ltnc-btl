@@ -17,6 +17,7 @@ Player::~Player() {
 
 Player::Player(int _x, int _y, int _score, SDL_Renderer* renderer): box(_x, _y, 3 * sizeBox / 2, 3 * sizeBox / 2) {
     score = _score;
+    loa = 1;
     penguinNomal = loadTexture("picture/penguin/penguinNomal.png", renderer);
     penguinJump = loadTexture("picture/penguin/penguinJump.png", renderer);
     penguinFall = loadTexture("picture/penguin/penguinFall.png", renderer);
@@ -45,7 +46,7 @@ void Player::turn(direct dir, int initSpeed, Mix_Chunk *mState) {
     if(dir == UP && (box.state[UP] || box.state[DOWN])) return;
     box.state[dir] = true;
     box.speed[dir] = initSpeed;
-    if(mState != NULL) Mix_PlayChannel( -1, mState, 0 );
+    if(mState != NULL && loa) Mix_PlayChannel( -1, mState, 0 );
 }
 
 void Player::prepare() {
@@ -121,13 +122,14 @@ bool Player::handle(vector<basicPlat>& plats, destinyPlat& dplat, int& level) {
     return 0;
 }
 
-void Player::keyboardEvent(SDL_Event e, Mix_Chunk *mJump) {
+void Player::keyboardEvent(SDL_Event e, Mix_Chunk *mJump, int& speaker) {
     // keyboard event
     switch (e.key.keysym.sym) {
         case SDLK_UP: turn(UP, MAXSPEED, mJump); break;
 //        case SDLK_DOWN: moveDown(); break;
         case SDLK_RIGHT: turn(RIGHT, sizeBox, NULL); break;
         case SDLK_LEFT: turn(LEFT, sizeBox, NULL); break;
+        case SDLK_p: speaker = 1 - speaker; loa = speaker; break;
         default: break;
     }
 }
@@ -135,18 +137,18 @@ void Player::keyboardEvent(SDL_Event e, Mix_Chunk *mJump) {
 bool Player::death(vector<deadPlat>& dPlats, vector<goalPlat>& gPlats, Mix_Chunk *mDead, Mix_Chunk *mGoal) {
     if (box.fallOut()) {
             // out of map
-        if(mDead != NULL) Mix_PlayChannel( -1, mDead, 0 );
+        if(mDead != NULL && loa) Mix_PlayChannel( -1, mDead, 0 );
         return 1;
     }
     for(deadPlat plat : dPlats) if(box.overlap(plat.box)) {
         // hit the dead plat
-        if(mDead != NULL) Mix_PlayChannel( -1, mDead, 0 );
+        if(mDead != NULL && loa) Mix_PlayChannel( -1, mDead, 0 );
         return 1;
     }
     for(goalPlat &plat : gPlats) if(plat.exist && box.overlap(plat.box)) {
         // collect coin
         score++;
-        if(mDead != NULL) Mix_PlayChannel( -1, mGoal, 0 );
+        if(mDead != NULL && loa) Mix_PlayChannel( -1, mGoal, 0 );
         plat.exist = false;
     }
     return 0;

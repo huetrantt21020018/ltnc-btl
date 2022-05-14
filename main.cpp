@@ -44,54 +44,56 @@ int main(int argc, char* argv[]) {
     vector<goalPlat> gPlats;
     destinyPlat dplat;
 
-    int level = 1;
-    initGame(player, plats, dPlats, gPlats, dplat, level, renderer, mStart);
+    while(true) {
 
-    SDL_Texture* background = loadTexture("picture/background/background1.png", renderer);
+        int level = 1;
+        int speaker = 1;
 
-    // present screen
-    present(renderer, background, player, plats, dPlats, gPlats, dplat);
-    endGame(START, renderer, NULL);
-    present(renderer, background, player, plats, dPlats, gPlats, dplat);
-    prepareNewLevel(level, renderer, background);
+        initGame(player, plats, dPlats, gPlats, dplat, level, renderer, mStart);
 
-    // game loop
+        SDL_Texture* background = loadTexture("picture/background/background1.png", renderer);
 
-    while(!player.death(dPlats, gPlats, mDead, mGoal)) {
+        if(makeMenu(renderer, font, background)) break;
+
         present(renderer, background, player, plats, dPlats, gPlats, dplat);
-        presentScore(renderer, font, textTexture, player.score);
-        player.prepare();
+        prepareNewLevel(level, renderer, background);
 
-        if(keyboardEvent(player, mJump)) break;
-        if(player.handle(plats, dplat, level) && level <= 3) {
-                // next level
-            initGame(player, plats, dPlats, gPlats, dplat, level, renderer, mNext);
+        // game loop
+
+        while(!player.death(dPlats, gPlats, mDead, mGoal)) {
             present(renderer, background, player, plats, dPlats, gPlats, dplat);
-            prepareNewLevel(level, renderer, background);
+            presentScore(renderer, font, textTexture, player.score, speaker);
+            player.prepare();
+
+            if(keyboardEvent(player, mJump, speaker)) break;
+            if(player.handle(plats, dplat, level) && level <= 3) {
+                    // next level
+                initGame(player, plats, dPlats, gPlats, dplat, level, renderer, mNext);
+                present(renderer, background, player, plats, dPlats, gPlats, dplat);
+                prepareNewLevel(level, renderer, background);
+            }
+            if(level > 3) break;
+
+            SDL_Delay(TIME_DELAY);
         }
-        if(level > 3) break;
 
-        SDL_Delay(TIME_DELAY);
+        // end game
+
+        present(renderer, background, player, plats, dPlats, gPlats, dplat);
+        presentScore(renderer, font, textTexture, player.score, speaker);
+        SDL_Delay(1000);
+
+        if(player.death(dPlats, gPlats, NULL, NULL)) endGame(LOSE, renderer, NULL, speaker);
+        else {
+            endGame(WIN, renderer, mWin, speaker);
+            updRanking(renderer, font, textTexture, player.score);
+        }
+        presentScore(renderer, font, textTexture, player.score, speaker);
+
+        // release memory
+
+        releaseMemory(player, plats, gPlats, dPlats, dplat, background, mDead, mGoal, mJump, mNext, mStart, mWin, mBeat);
     }
-
-    // end game
-
-    present(renderer, background, player, plats, dPlats, gPlats, dplat);
-    presentScore(renderer, font, textTexture, player.score);
-    SDL_Delay(1000);
-
-    if(player.death(dPlats, gPlats, NULL, NULL)) endGame(LOSE, renderer, NULL);
-    else {
-        endGame(WIN, renderer, mWin);
-        updRanking(renderer, font, textTexture, player.score);
-    }
-    presentScore(renderer, font, textTexture, player.score);
-
-    waitUntilKeyPressed();
-
-    // release memory
-
-    releaseMemory(player, plats, gPlats, dPlats, dplat, background, mDead, mGoal, mJump, mNext, mStart, mWin, mBeat);
 
     quitSDL(window, renderer);
     return 0;

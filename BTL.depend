@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1652455334 source:c:\users\sinhvienuet\ltnc\btl\main.cpp
+1652514587 source:c:\users\sinhvienuet\ltnc\btl\main.cpp
 	<SDL.h>
 	<SDL_ttf.h>
 	<SDL_mixer.h>
@@ -23,11 +23,11 @@
 	<SDL_mixer.h>
 	"SDL_utils.h"
 
-1651892584 c:\users\sinhvienuet\ltnc\btl\common.h
+1652500028 c:\users\sinhvienuet\ltnc\btl\common.h
 	<string>
 	"common.h"
 
-1652365966 c:\users\sinhvienuet\ltnc\btl\maingame.h
+1652514565 c:\users\sinhvienuet\ltnc\btl\maingame.h
 	<SDL.h>
 	<SDL_image.h>
 	<SDL_mixer.h>
@@ -42,7 +42,7 @@
 	"SDL_utils.h"
 	"SDL_text.h"
 
-1652420608 source:c:\users\sinhvienuet\ltnc\btl\maingame.cpp
+1652514565 source:c:\users\sinhvienuet\ltnc\btl\maingame.cpp
 	"mainGame.h"
 
 1651591400 source:c:\users\sinhvienuet\ltnc\btl\text_object.cpp
@@ -58,13 +58,13 @@
 	<cmath>
 	"text_Object.h"
 
-1652363900 c:\users\sinhvienuet\ltnc\btl\sdl_text.h
+1652496878 c:\users\sinhvienuet\ltnc\btl\sdl_text.h
 	<iostream>
 	<SDL.h>
 	<SDL_ttf.h>
 	"SDL_text.h"
 
-1652363879 source:c:\users\sinhvienuet\ltnc\btl\sdl_text.cpp
+1652496911 source:c:\users\sinhvienuet\ltnc\btl\sdl_text.cpp
 	"SDL_text.h"
 	<iostream>
 	<SDL_image.h>
@@ -102,7 +102,7 @@
 	<SDL_mixer.h>
 	<SDL_ttf.h>
 
-1652365695 c:\users\sinhvienuet\ltnc\btl\player.h
+1652500328 c:\users\sinhvienuet\ltnc\btl\player.h
 	"common.h"
 	"SDL_text.h"
 	"SDL_utils.h"
@@ -116,6 +116,6 @@
 1652281290 source:c:\users\sinhvienuet\ltnc\btl\plat.cpp
 	"plat.h"
 
-1652365363 source:c:\users\sinhvienuet\ltnc\btl\player.cpp
+1652514428 source:c:\users\sinhvienuet\ltnc\btl\player.cpp
 	"player.h"
 

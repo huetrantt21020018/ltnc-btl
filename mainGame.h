@@ -23,14 +23,14 @@ void initGame(Player& player, vector<basicPlat>& plats, vector<deadPlat>& dPlats
 
 // present everything
 
-void presentScore(SDL_Renderer* renderer, TTF_Font* font, LTexture textTexture, int score);
+void presentScore(SDL_Renderer* renderer, TTF_Font* font, LTexture textTexture, int score, int speaker);
 
 void present(SDL_Renderer* renderer, SDL_Texture* background, Player &box, vector<basicPlat> &plats, vector<deadPlat>& dPlats, vector<goalPlat>& gPlats, destinyPlat& gplat);
 
-bool keyboardEvent(Player& player, Mix_Chunk* mState);
+bool keyboardEvent(Player& player, Mix_Chunk* mState, int& speaker);
 
 // print the status if the game is over
-void endGame(game Game, SDL_Renderer* renderer, Mix_Chunk *mState);
+void endGame(game Game, SDL_Renderer* renderer, Mix_Chunk *mState, int speaker);
 
 void updRanking(SDL_Renderer* renderer, TTF_Font* font, LTexture textTexture, int score);
 
@@ -41,4 +41,5 @@ void free(vector<basicPlat> &plats, vector<goalPlat> &gPlats, vector<deadPlat> &
 void releaseMemory(Player &player, vector<basicPlat> &plats, vector<goalPlat> &gPlats, vector<deadPlat> &dPlats, destinyPlat &dplat, SDL_Texture* &background,
                   Mix_Chunk* &mDead, Mix_Chunk* &mGoal, Mix_Chunk* &mJump, Mix_Chunk* &mNext, Mix_Chunk* &mStart, Mix_Chunk* &mWin, Mix_Music* &mBeat);
 
+int makeMenu(SDL_Renderer* renderer, TTF_Font* font, SDL_Texture* background);
 #endif // MAIN_GAME
